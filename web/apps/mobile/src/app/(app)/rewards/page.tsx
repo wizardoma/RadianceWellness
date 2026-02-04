@@ -15,7 +15,7 @@ import {
   Zap,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Button, Badge, Separator, Progress } from "@radiance/ui";
+import { Button, Badge, Separator } from "@radiance/ui";
 import { formatCurrency } from "@radiance/utils";
 
 // Mock user rewards data

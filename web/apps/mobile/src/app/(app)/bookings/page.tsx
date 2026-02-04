@@ -63,7 +63,18 @@ const mockBookings = {
   ],
 };
 
-const BookingCard = ({ booking, isPast = false }: { booking: typeof mockBookings.upcoming[0], isPast?: boolean }) => (
+interface BookingData {
+  id: string;
+  service: string;
+  date: string;
+  time: string;
+  duration: number;
+  therapist: string | null;
+  price: number;
+  status: string;
+}
+
+const BookingCard = ({ booking, isPast = false }: { booking: BookingData, isPast?: boolean }) => (
   <div className="bg-white rounded-xl border border-border p-4">
     <div className="flex gap-3">
       <div className={`w-14 h-14 rounded-xl flex items-center justify-center ${isPast ? "bg-gray-100" : "bg-primary-100"}`}>

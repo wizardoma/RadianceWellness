@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { 
   Clock, 
@@ -271,7 +271,7 @@ const initialWalkInForm: WalkInForm = {
   payNow: true,
 };
 
-export default function CheckInPage() {
+function CheckInPageContent() {
   const searchParams = useSearchParams();
   const [bookings, setBookings] = useState<Booking[]>(initialBookings);
   const [searchQuery, setSearchQuery] = useState("");
@@ -1154,9 +1154,11 @@ export default function CheckInPage() {
                 if (walkInStep === "customer") {
                   setShowWalkInDialog(false);
                 } else {
-                  const steps: typeof walkInStep[] = ["customer", "services", "assign", "confirm"];
+                  const steps = ["customer", "services", "assign", "confirm"] as const;
                   const currentIndex = steps.indexOf(walkInStep);
-                  setWalkInStep(steps[currentIndex - 1]);
+                  if (currentIndex > 0) {
+                    setWalkInStep(steps[currentIndex - 1]);
+                  }
                 }
               }}
             >
@@ -1180,9 +1182,11 @@ export default function CheckInPage() {
             ) : (
               <Button 
                 onClick={() => {
-                  const steps: typeof walkInStep[] = ["customer", "services", "assign", "confirm"];
+                  const steps = ["customer", "services", "assign", "confirm"] as const;
                   const currentIndex = steps.indexOf(walkInStep);
-                  setWalkInStep(steps[currentIndex + 1]);
+                  if (currentIndex < steps.length - 1) {
+                    setWalkInStep(steps[currentIndex + 1]);
+                  }
                 }}
                 disabled={!canProceedWalkIn()}
               >
@@ -1194,5 +1198,17 @@ export default function CheckInPage() {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+export default function CheckInPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary-600 border-t-transparent" />
+      </div>
+    }>
+      <CheckInPageContent />
+    </Suspense>
   );
 }

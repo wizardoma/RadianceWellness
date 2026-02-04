@@ -3,7 +3,7 @@ export interface Service {
   id: string;
   name: string;
   slug: string;
-  category: ServiceCategory;
+  category: ServiceCategoryType;
   description: string;
   shortDescription: string;
   benefits: string[];
@@ -20,14 +20,14 @@ export interface Service {
   whatToExpect?: string;
 }
 
-export type ServiceCategory =
+export type ServiceCategoryType =
   | "thermal-bathing"
   | "massage-therapy"
   | "beauty-grooming"
   | "fitness";
 
 export interface ServiceCategory {
-  id: ServiceCategory;
+  id: ServiceCategoryType;
   name: string;
   description: string;
   icon: string;
