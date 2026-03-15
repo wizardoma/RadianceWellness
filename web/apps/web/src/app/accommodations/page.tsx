@@ -128,7 +128,7 @@ function ApartmentSection({
   reversed,
   index,
 }: {
-  apartment: typeof premiumApartment;
+  apartment: Omit<typeof premiumApartment, 'badgeVariant'> & { badgeVariant: "accent" | "secondary" };
   reversed?: boolean;
   index: number;
 }) {
