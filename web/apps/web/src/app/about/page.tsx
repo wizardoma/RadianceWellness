@@ -120,7 +120,7 @@ export default function AboutPage() {
               <span className="text-accent-400">Mind, Body & Soul</span>
             </h1>
             <p className="text-xl text-primary-100 leading-relaxed">
-              Radiance Wellness Center was born from a simple belief: everyone
+              Radiance Wellness Spa was born from a simple belief: everyone
               deserves access to premium wellness experiences that nurture their
               complete well-being.
             </p>
@@ -165,7 +165,7 @@ export default function AboutPage() {
               </h2>
               <div className="space-y-4 text-foreground-secondary">
                 <p>
-                  Founded in 2016, Radiance Wellness Center began as a small spa
+                  Founded in 2016, Radiance Wellness Spa began as a small spa
                   with a big dream: to create a haven where Nigerians could
                   experience world-class wellness services without traveling
                   abroad.
@@ -218,7 +218,7 @@ export default function AboutPage() {
                   <div className="h-64 rounded-xl bg-primary-100 overflow-hidden">
                     <img
                       src="https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?q=80&w=600"
-                      alt="Wellness center"
+                      alt="Wellness spa"
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -421,11 +421,18 @@ export default function AboutPage() {
               <Card className="bg-gradient-to-br from-primary-500 to-primary-600 text-white">
                 <CardContent className="p-8">
                   <Quote className="h-10 w-10 text-primary-200 mb-4" />
-                  <blockquote className="text-xl font-medium mb-6">
-                    "Our mission is to be the leading wellness destination in
-                    Africa, inspiring people to live healthier, happier lives
-                    through holistic care and exceptional service."
-                  </blockquote>
+                  <div className="mb-6">
+                    <p className="text-sm font-semibold text-primary-200 uppercase tracking-wider mb-2">Our Mission</p>
+                    <blockquote className="text-xl font-medium">
+                      "Elevate wellness experience through thoughtfully curated spaces and services that inspire balance, vitality and self care."
+                    </blockquote>
+                  </div>
+                  <div className="mb-6">
+                    <p className="text-sm font-semibold text-primary-200 uppercase tracking-wider mb-2">Our Vision</p>
+                    <blockquote className="text-xl font-medium">
+                      "To launch a premium health and wellness brand designed to meet the revolving needs of health conscious urban-dwellers."
+                    </blockquote>
+                  </div>
                   <div>
                     <p className="font-semibold">Dr. Amara Okonkwo</p>
                     <p className="text-primary-200 text-sm">

@@ -176,7 +176,7 @@ export function ServicePricing({ serviceId, durations, prices, addOns }: Service
             Our team is here to help you choose the right treatment.
           </p>
           <Button variant="outline" size="sm" asChild>
-            <a href="https://wa.me/2348001234567">Chat with us</a>
+            <a href="https://wa.me/2348033118603">Chat with us</a>
           </Button>
         </CardContent>
       </Card>

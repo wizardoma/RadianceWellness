@@ -4,7 +4,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Privacy Policy",
   description:
-    "Learn how Radiance Wellness Center collects, uses, and protects your personal information.",
+    "Learn how Radiance Wellness Spa collects, uses, and protects your personal information.",
 };
 
 export default function PrivacyPolicyPage() {
@@ -27,7 +27,7 @@ export default function PrivacyPolicyPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto prose prose-gray prose-headings:font-display prose-headings:text-primary-900 prose-a:text-primary-600 prose-a:no-underline hover:prose-a:underline">
             <p className="text-lg text-foreground-secondary leading-relaxed">
-              At Radiance Wellness Center, we are committed to protecting your
+              At Radiance Wellness Spa, we are committed to protecting your
               privacy and ensuring the security of your personal information.
               This Privacy Policy explains how we collect, use, disclose, and
               safeguard your data when you use our services, website, and mobile
@@ -196,7 +196,7 @@ export default function PrivacyPolicyPage() {
               </li>
               <li>
                 <strong>Phone:</strong>{" "}
-                <a href="tel:+2348001234567">+234 800 123 4567</a>
+                <a href="tel:+2348033118603">+234 803 311 8603</a>
               </li>
               <li>
                 <strong>Address:</strong> 1 Setif Close, Adzope Crescent, Off

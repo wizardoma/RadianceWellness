@@ -19,7 +19,7 @@ export function WelcomeSection() {
             <div className="relative aspect-[4/5] rounded-3xl overflow-hidden">
               <img
                 src="https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?q=80&w=2070"
-                alt="Radiance Wellness Center Interior"
+                alt="Radiance Wellness Spa Interior"
                 className="w-full h-full object-cover"
               />
               {/* Decorative elements */}
@@ -67,7 +67,7 @@ export function WelcomeSection() {
 
             {/* Description */}
             <p className="text-lg text-gray-600 leading-relaxed mb-8">
-              At Radiance Wellness Center, we believe that true wellness encompasses 
+              At Radiance Wellness Spa, we believe that true wellness encompasses 
               the harmony of mind, body, and spirit. Our state-of-the-art facility 
               offers a comprehensive range of services designed to help you achieve 
               optimal health and relaxation.

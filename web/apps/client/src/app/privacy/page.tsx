@@ -18,7 +18,7 @@ export default function PrivacyPolicyPage() {
 
           <div className="space-y-8 text-gray-700 leading-relaxed">
             <p>
-              At Radiance Wellness Center, we are committed to protecting your privacy and ensuring
+              At Radiance Wellness Spa, we are committed to protecting your privacy and ensuring
               the security of your personal information. This Privacy Policy explains how we
               collect, use, store, and protect your data when you use our website, applications, and
               services.
@@ -99,7 +99,7 @@ export default function PrivacyPolicyPage() {
               </h2>
               <p>
                 All payment transactions are processed securely through Paystack, our authorized
-                third-party payment processor. Radiance Wellness Center does not store, process, or
+                third-party payment processor. Radiance Wellness Spa does not store, process, or
                 have access to your full credit card or debit card details. Paystack handles all
                 payment data in compliance with PCI DSS (Payment Card Industry Data Security
                 Standards). We only retain a record of the transaction amount, date, and a masked
@@ -133,7 +133,7 @@ export default function PrivacyPolicyPage() {
                 <li>
                   <strong>Legal Requirements:</strong> We may disclose your information if required
                   by law, court order, or government regulation, or if necessary to protect the
-                  rights and safety of Radiance Wellness Center and its clients.
+                  rights and safety of Radiance Wellness Spa and its clients.
                 </li>
               </ul>
             </section>
@@ -211,7 +211,7 @@ export default function PrivacyPolicyPage() {
                 how we handle your personal data, please contact us:
               </p>
               <div className="bg-gray-50 rounded-xl p-4 space-y-1 text-sm">
-                <p className="font-medium text-gray-900">Radiance Wellness Center</p>
+                <p className="font-medium text-gray-900">Radiance Wellness Spa</p>
                 <p>123 Wellness Boulevard, Maitama District</p>
                 <p>Abuja, FCT, Nigeria</p>
                 <p>Email: privacy@radiancewellness.ng</p>

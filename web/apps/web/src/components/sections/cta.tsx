@@ -59,7 +59,7 @@ export function CTASection() {
                 className="border-white/30 text-white hover:bg-white/10"
                 asChild
               >
-                <a href="tel:+2348001234567">
+                <a href="tel:+2348033118603">
                   <Phone className="mr-2 h-5 w-5" />
                   Call Us Now
                 </a>
@@ -70,7 +70,7 @@ export function CTASection() {
             <div className="flex flex-wrap items-center gap-6 text-primary-200">
               <span className="text-sm">Or reach us via:</span>
               <a 
-                href="https://wa.me/2348001234567"
+                href="https://wa.me/2348033118603"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center text-sm hover:text-white transition-colors"
@@ -79,10 +79,10 @@ export function CTASection() {
                 WhatsApp
               </a>
               <a 
-                href="mailto:hello@radiancewellness.com"
+                href="mailto:enquiries@radiancewellness.com"
                 className="flex items-center text-sm hover:text-white transition-colors"
               >
-                hello@radiancewellness.com
+                enquiries@radiancewellness.com
               </a>
             </div>
           </motion.div>

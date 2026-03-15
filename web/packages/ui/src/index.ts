@@ -25,6 +25,7 @@ export * from "./components/accordion";
 
 // Custom Components
 export * from "./components/calendar";
+export * from "./components/logo";
 
 // Re-export utils
 export { cn } from "@radiance/utils";

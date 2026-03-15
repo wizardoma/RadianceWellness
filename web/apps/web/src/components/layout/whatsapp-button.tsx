@@ -3,8 +3,8 @@
 import { motion } from "framer-motion";
 import { MessageCircle } from "lucide-react";
 
-const WHATSAPP_NUMBER = "2348001234567";
-const DEFAULT_MESSAGE = "Hello! I'm interested in learning more about Radiance Wellness Center.";
+const WHATSAPP_NUMBER = "2348033118603";
+const DEFAULT_MESSAGE = "Hello! I'm interested in learning more about Radiance Wellness Spa.";
 
 export function WhatsAppButton() {
   const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(DEFAULT_MESSAGE)}`;

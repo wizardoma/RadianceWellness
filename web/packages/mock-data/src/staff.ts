@@ -33,7 +33,7 @@ export const staff: Staff[] = [
     avatar: "/images/staff/ada.jpg",
     role: "Beauty Specialist",
     department: "Beauty & Grooming",
-    services: ["signature-facial", "manicure-pedicure", "hair-styling"],
+    services: ["signature-facial", "manicure", "hair-styling"],
     bio: "Ada is a licensed esthetician with expertise in skincare and beauty treatments. She stays current with the latest techniques and products.",
     isActive: true,
   },

@@ -426,7 +426,7 @@ export default function OrdersPage() {
                   <div className="text-sm text-gray-600">
                     <p className="flex items-center gap-1">
                       <MapPin className="h-4 w-4" />
-                      Radiance Wellness Center
+                      Radiance Wellness Spa
                     </p>
                     <p className="ml-5">1 Setif Close, Wuse 2, Abuja</p>
                     <p className="flex items-center gap-1 mt-1">

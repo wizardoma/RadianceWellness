@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LogoIcon } from "@radiance/ui";
 
 export default function AuthLayout({
   children,
@@ -11,8 +12,8 @@ export default function AuthLayout({
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary-600 to-primary-800 p-12 flex-col justify-between">
         <div>
           <Link href="/" className="flex items-center space-x-3">
-            <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
-              <span className="text-white font-display text-2xl font-bold">R</span>
+            <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center p-1">
+              <LogoIcon size={40} />
             </div>
             <span className="font-display text-2xl font-semibold text-white">
               Radiance
@@ -47,7 +48,7 @@ export default function AuthLayout({
         </div>
 
         <div className="text-primary-200 text-sm">
-          © {new Date().getFullYear()} Radiance Wellness Center
+          © {new Date().getFullYear()} Radiance Wellness Spa
         </div>
       </div>
 
@@ -57,9 +58,7 @@ export default function AuthLayout({
           {/* Mobile logo */}
           <div className="lg:hidden mb-8 text-center">
             <Link href="/" className="inline-flex items-center space-x-2">
-              <div className="w-10 h-10 rounded-full bg-primary-500 flex items-center justify-center">
-                <span className="text-white font-display text-xl font-bold">R</span>
-              </div>
+              <LogoIcon size={40} />
               <span className="font-display text-xl font-semibold text-primary-700">
                 Radiance
               </span>

@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ChevronDown, Phone } from "lucide-react";
 import { cn } from "@radiance/utils";
-import { Button } from "@radiance/ui";
+import { Button, LogoIcon } from "@radiance/ui";
 import { serviceCategories } from "@radiance/mock-data";
 
 const navItems = [
@@ -70,9 +70,7 @@ export function Navbar() {
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
-            <div className="w-10 h-10 rounded-full bg-primary-500 flex items-center justify-center">
-              <span className="text-white font-display text-xl font-bold">R</span>
-            </div>
+            <LogoIcon size={40} />
             <span
               className={cn(
                 "font-display text-xl font-semibold transition-colors",
@@ -149,14 +147,14 @@ export function Navbar() {
           {/* CTA Buttons */}
           <div className="hidden lg:flex items-center space-x-3">
             <a
-              href="tel:+2348001234567"
+              href="tel:+2348033118603"
               className={cn(
                 "flex items-center text-sm font-medium transition-colors",
                 showSolidNavbar ? "text-gray-600" : "text-white/90"
               )}
             >
               <Phone className="h-4 w-4 mr-1.5" />
-              <span className="hidden xl:inline">+234 800 123 4567</span>
+              <span className="hidden xl:inline">+234 803 311 8603</span>
             </a>
             <Button asChild>
               <Link href="/book">Book Now</Link>
@@ -232,11 +230,11 @@ export function Navbar() {
               
               <div className="pt-4 border-t border-border mt-4">
                 <a
-                  href="tel:+2348001234567"
+                  href="tel:+2348033118603"
                   className="flex items-center px-4 py-3 text-gray-600"
                 >
                   <Phone className="h-5 w-5 mr-3" />
-                  +234 800 123 4567
+                  +234 803 311 8603
                 </a>
               </div>
             </div>

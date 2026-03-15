@@ -52,7 +52,7 @@ export default function LoginPage() {
                 Admin Login
               </h2>
               <p className="text-sm text-foreground-secondary mt-1">
-                Full access to manage the wellness center
+                Full access to manage the wellness spa
               </p>
             </div>
           </TabsContent>

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Smartphone, Monitor, RotateCcw, ExternalLink } from "lucide-react";
+import { LogoIcon } from "@radiance/ui";
 
 interface DeviceFrameProps {
   children: React.ReactNode;
@@ -29,8 +30,8 @@ export function DeviceFrame({ children }: DeviceFrameProps) {
       {/* Header */}
       <div className="text-center mb-6 text-white">
         <div className="flex items-center justify-center gap-2 mb-2">
-          <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
-            <span className="text-white font-display text-xl font-bold">R</span>
+          <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center p-1">
+            <LogoIcon size={32} />
           </div>
           <h1 className="font-display text-2xl font-bold">Radiance Wellness</h1>
         </div>

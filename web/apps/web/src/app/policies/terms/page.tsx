@@ -4,7 +4,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Terms of Service",
   description:
-    "Read the terms and conditions for using Radiance Wellness Center services.",
+    "Read the terms and conditions for using Radiance Wellness Spa services.",
 };
 
 export default function TermsOfServicePage() {
@@ -27,7 +27,7 @@ export default function TermsOfServicePage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto prose prose-gray prose-headings:font-display prose-headings:text-primary-900 prose-a:text-primary-600 prose-a:no-underline hover:prose-a:underline">
             <p className="text-lg text-foreground-secondary leading-relaxed">
-              Welcome to Radiance Wellness Center. These Terms of Service
+              Welcome to Radiance Wellness Spa. These Terms of Service
               ("Terms") govern your use of our website, mobile application,
               and services. By accessing or using our services, you agree to be
               bound by these Terms. Please read them carefully.
@@ -38,7 +38,7 @@ export default function TermsOfServicePage() {
             </h2>
             <p className="text-foreground-secondary leading-relaxed">
               By creating an account, making a booking, purchasing services, or
-              otherwise using Radiance Wellness Center's services, you
+              otherwise using Radiance Wellness Spa's services, you
               acknowledge that you have read, understood, and agree to be bound
               by these Terms and our{" "}
               <Link href="/policies/privacy">Privacy Policy</Link>. If you do
@@ -55,7 +55,7 @@ export default function TermsOfServicePage() {
               2. Our Services
             </h2>
             <p className="text-foreground-secondary leading-relaxed">
-              Radiance Wellness Center provides spa, wellness, fitness, beauty,
+              Radiance Wellness Spa provides spa, wellness, fitness, beauty,
               and accommodation services at our facility in Wuse 2, Abuja,
               Nigeria. Service descriptions, availability, and pricing are
               subject to change without prior notice. We reserve the right to
@@ -129,7 +129,7 @@ export default function TermsOfServicePage() {
               6. Gift Cards
             </h2>
             <p className="text-foreground-secondary leading-relaxed">
-              Gift cards purchased from Radiance Wellness Center are
+              Gift cards purchased from Radiance Wellness Spa are
               non-refundable and cannot be exchanged for cash. Gift cards are
               valid for 12 months from the date of purchase. The balance can be
               used toward any service or product at our facility. Gift cards may
@@ -141,7 +141,7 @@ export default function TermsOfServicePage() {
               7. Limitation of Liability
             </h2>
             <p className="text-foreground-secondary leading-relaxed">
-              Radiance Wellness Center and its staff shall not be held liable for
+              Radiance Wellness Spa and its staff shall not be held liable for
               any indirect, incidental, consequential, or punitive damages
               arising from your use of our services. Our total liability for any
               claim shall not exceed the amount you paid for the specific service
@@ -172,7 +172,7 @@ export default function TermsOfServicePage() {
               </li>
               <li>
                 <strong>Phone:</strong>{" "}
-                <a href="tel:+2348001234567">+234 800 123 4567</a>
+                <a href="tel:+2348033118603">+234 803 311 8603</a>
               </li>
               <li>
                 <strong>Address:</strong> 1 Setif Close, Adzope Crescent, Off

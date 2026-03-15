@@ -18,7 +18,7 @@ import {
   Package,
 } from "lucide-react";
 import { cn } from "@radiance/utils";
-import { Button } from "@radiance/ui";
+import { Button, LogoIcon } from "@radiance/ui";
 import { useState } from "react";
 
 const navigation = [
@@ -78,9 +78,7 @@ export function DashboardSidebar() {
           {/* Logo */}
           <div className="p-6 border-b border-border">
             <Link href="/dashboard" className="flex items-center space-x-2">
-              <div className="w-10 h-10 rounded-full bg-primary-500 flex items-center justify-center">
-                <span className="text-white font-display text-xl font-bold">R</span>
-              </div>
+              <LogoIcon size={40} />
               <span className="font-display text-xl font-semibold text-primary-700">
                 Radiance
               </span>

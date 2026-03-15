@@ -1,6 +1,6 @@
-# Radiance Wellness Center - Frontend Monorepo
+# Radiance Wellness Spa - Frontend Monorepo
 
-A Turborepo-based monorepo containing all frontend applications for Radiance Wellness Center.
+A Turborepo-based monorepo containing all frontend applications for Radiance Wellness Spa.
 
 ## Tech Stack
 

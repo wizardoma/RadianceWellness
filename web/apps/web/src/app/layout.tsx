@@ -18,11 +18,11 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   metadataBase: new URL("https://radiancewellness.com"),
   title: {
-    default: "Radiance Wellness Center | Premium Spa & Wellness in Abuja",
-    template: "%s | Radiance Wellness Center",
+    default: "Radiance Wellness Spa | Premium Spa & Wellness in Abuja",
+    template: "%s | Radiance Wellness Spa",
   },
   description:
-    "Experience premium wellness services at Radiance Wellness Center. Offering massage therapy, thermal bathing, beauty treatments, fitness, and luxury accommodations in Abuja, Nigeria.",
+    "Experience premium wellness services at Radiance Wellness Spa. Offering massage therapy, thermal bathing, beauty treatments, fitness, and luxury accommodations in Abuja, Nigeria.",
   keywords: [
     "spa",
     "wellness",
@@ -40,22 +40,22 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_NG",
     url: "https://radiancewellness.com",
-    siteName: "Radiance Wellness Center",
-    title: "Radiance Wellness Center | Premium Spa & Wellness in Abuja",
+    siteName: "Radiance Wellness Spa",
+    title: "Radiance Wellness Spa | Premium Spa & Wellness in Abuja",
     description:
-      "Experience premium wellness services at Radiance Wellness Center. Massage therapy, thermal bathing, beauty treatments, and more.",
+      "Experience premium wellness services at Radiance Wellness Spa. Massage therapy, thermal bathing, beauty treatments, and more.",
     images: [
       {
         url: "/images/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "Radiance Wellness Center",
+        alt: "Radiance Wellness Spa",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Radiance Wellness Center | Premium Spa & Wellness",
+    title: "Radiance Wellness Spa | Premium Spa & Wellness",
     description: "Experience premium wellness services in Abuja, Nigeria.",
     images: ["/images/og-image.jpg"],
   },

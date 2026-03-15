@@ -63,7 +63,8 @@ export const packages: Package[] = [
     description: "Complete beauty transformation. Get pampered with our signature facial, manicure, pedicure, and professional hair styling.",
     services: [
       { serviceId: "signature-facial", serviceName: "Signature Facial", duration: 60 },
-      { serviceId: "manicure-pedicure", serviceName: "Manicure & Pedicure", duration: 60 },
+      { serviceId: "manicure", serviceName: "Manicure", duration: 30 },
+      { serviceId: "pedicure", serviceName: "Pedicure", duration: 30 },
       { serviceId: "hair-styling", serviceName: "Hair Styling", duration: 60 },
     ],
     originalPrice: 47000,

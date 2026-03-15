@@ -224,10 +224,10 @@ const getMemberBadge = (tier: string | null) => {
 
 // Available therapists
 const therapists = [
-  { id: "T1", name: "Chidi Eze", specialties: ["massage", "thermal-bathing"], available: true },
-  { id: "T2", name: "Fatima Mohammed", specialties: ["massage", "thermal-bathing"], available: true },
-  { id: "T3", name: "Amina Bello", specialties: ["beauty-grooming"], available: true },
-  { id: "T4", name: "Grace Okafor", specialties: ["beauty-grooming"], available: false },
+  { id: "T1", name: "Chidi Eze", specialties: ["spa", "treatments"], available: true },
+  { id: "T2", name: "Fatima Mohammed", specialties: ["spa", "treatments"], available: true },
+  { id: "T3", name: "Amina Bello", specialties: ["salon"], available: true },
+  { id: "T4", name: "Grace Okafor", specialties: ["salon"], available: false },
   { id: "T5", name: "Emeka Nwosu", specialties: ["fitness-wellness"], available: true },
 ];
 

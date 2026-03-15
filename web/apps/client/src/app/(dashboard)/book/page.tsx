@@ -747,7 +747,7 @@ export default function BookServicePage() {
                             </div>
                             <div className="flex justify-between text-sm">
                               <span className="text-foreground-muted">Account Name</span>
-                              <span className="font-medium">Radiance Wellness Center</span>
+                              <span className="font-medium">Radiance Wellness Spa</span>
                             </div>
                           </div>
                           <p className="text-xs text-foreground-muted mt-3">

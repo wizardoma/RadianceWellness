@@ -9,36 +9,40 @@ export interface ServiceCategoryData {
 
 export const serviceCategories: ServiceCategoryData[] = [
   {
-    id: "thermal-bathing",
-    name: "Thermal & Bathing",
-    description: "Rejuvenate your body with our premium thermal experiences including sauna, hammam, and steam bath.",
-    icon: "Flame",
-    image: "/images/categories/thermal.jpg",
-    slug: "thermal-bathing",
-  },
-  {
-    id: "massage-therapy",
-    name: "Massage & Therapy",
-    description: "Expert massage treatments designed to relieve stress, ease tension, and restore balance.",
-    icon: "Hand",
-    image: "/images/categories/massage.jpg",
-    slug: "massage-therapy",
-  },
-  {
-    id: "beauty-grooming",
-    name: "Beauty & Grooming",
-    description: "Full-service salon offering professional hair, skin, and beauty treatments.",
+    id: "spa",
+    name: "Spa",
+    description:
+      "Indulge in premium spa experiences including body scrubs, hammam baths, facials, massages, and steam & sauna sessions.",
     icon: "Sparkles",
-    image: "/images/categories/beauty.jpg",
-    slug: "beauty-grooming",
+    image: "/images/categories/spa.jpg",
+    slug: "spa",
   },
   {
-    id: "fitness",
-    name: "Fitness",
-    description: "State-of-the-art gym facilities and group fitness classes for all levels.",
+    id: "treatments",
+    name: "Treatments",
+    description:
+      "Advanced wellness and aesthetic treatments including IV therapy, acupuncture, hair transplant, and specialized skin therapies.",
+    icon: "Stethoscope",
+    image: "/images/categories/treatments.jpg",
+    slug: "treatments",
+  },
+  {
+    id: "gym",
+    name: "Gym",
+    description:
+      "State-of-the-art gym facilities, group fitness classes, water therapy, and specialized workout programs for all levels.",
     icon: "Dumbbell",
-    image: "/images/categories/fitness.jpg",
-    slug: "fitness",
+    image: "/images/categories/gym.jpg",
+    slug: "gym",
+  },
+  {
+    id: "salon",
+    name: "Salon",
+    description:
+      "Full-service salon offering professional hair styling, braids, nail care, eyebrow treatments, and grooming services for men and women.",
+    icon: "Scissors",
+    image: "/images/categories/salon.jpg",
+    slug: "salon",
   },
 ];
 

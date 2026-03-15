@@ -13,8 +13,8 @@ import {
   Heart,
   Gift,
   Users,
-  Flame,
-  Hand,
+  Stethoscope,
+  Scissors,
   Dumbbell,
 } from "lucide-react";
 import {
@@ -37,10 +37,10 @@ import { formatCurrency, formatDuration } from "@radiance/utils";
 /* ------------------------------------------------------------------ */
 
 const categoryIcons: Record<string, React.ElementType> = {
-  "thermal-bathing": Flame,
-  "massage-therapy": Hand,
-  "beauty-grooming": Sparkles,
-  fitness: Dumbbell,
+  spa: Sparkles,
+  treatments: Stethoscope,
+  gym: Dumbbell,
+  salon: Scissors,
 };
 
 const packageDeals = [

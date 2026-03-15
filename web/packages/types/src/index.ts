@@ -21,10 +21,10 @@ export interface Service {
 }
 
 export type ServiceCategoryType =
-  | "thermal-bathing"
-  | "massage-therapy"
-  | "beauty-grooming"
-  | "fitness";
+  | "spa"
+  | "treatments"
+  | "gym"
+  | "salon";
 
 export interface ServiceCategory {
   id: ServiceCategoryType;

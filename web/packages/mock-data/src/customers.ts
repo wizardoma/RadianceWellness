@@ -92,7 +92,7 @@ export const customers: Customer[] = [
     createdAt: "2025-08-12T16:45:00Z",
     preferences: {
       preferredTimes: ["morning"],
-      favoriteServices: ["signature-facial", "manicure-pedicure"],
+      favoriteServices: ["signature-facial", "manicure"],
       communicationPreferences: {
         email: true,
         sms: true,

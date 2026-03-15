@@ -186,7 +186,7 @@ export default function CheckoutPage() {
               </div>
               {shipping.deliveryMethod === "pickup" ? (
                 <div className="text-sm text-foreground-secondary">
-                  <p>Radiance Wellness Center</p>
+                  <p>Radiance Wellness Spa</p>
                   <p>Ready for pickup in 1-2 business days</p>
                   <p className="mt-1 text-foreground-muted">You'll receive an SMS when your order is ready</p>
                 </div>
@@ -409,7 +409,7 @@ export default function CheckoutPage() {
                     <div className="flex items-start gap-3">
                       <Store className="h-5 w-5 text-primary-600 mt-0.5" />
                       <div>
-                        <p className="font-medium text-gray-900">Radiance Wellness Center</p>
+                        <p className="font-medium text-gray-900">Radiance Wellness Spa</p>
                         <p className="text-sm text-foreground-secondary">
                           12 Victoria Island Boulevard, Lagos
                         </p>

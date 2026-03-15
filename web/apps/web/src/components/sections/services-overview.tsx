@@ -2,21 +2,21 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowUpRight, Flame, Hand, Sparkles, Dumbbell } from "lucide-react";
+import { ArrowUpRight, Sparkles, Stethoscope, Dumbbell, Scissors } from "lucide-react";
 import { serviceCategories } from "@radiance/mock-data";
 
-const iconMap = {
-  Flame,
-  Hand,
+const iconMap: Record<string, React.ElementType> = {
   Sparkles,
+  Stethoscope,
   Dumbbell,
+  Scissors,
 };
 
-const categoryImages = {
-  "thermal-bathing": "https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=80&w=2070",
-  "massage-therapy": "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?q=80&w=2070",
-  "beauty-grooming": "https://images.unsplash.com/photo-1560750588-73207b1ef5b8?q=80&w=2070",
-  "fitness": "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070",
+const categoryImages: Record<string, string> = {
+  spa: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=80&w=2070",
+  treatments: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?q=80&w=2070",
+  gym: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070",
+  salon: "https://images.unsplash.com/photo-1560750588-73207b1ef5b8?q=80&w=2070",
 };
 
 export function ServicesOverview() {

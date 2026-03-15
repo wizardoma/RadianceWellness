@@ -24,7 +24,7 @@ const faqCategories = {
       {
         question: "What services do you offer?",
         answer:
-          "Radiance Wellness Center offers a comprehensive range of services including thermal bathing (sauna, steam room, hammam), massage therapy (Swedish, deep tissue, hot stone, and more), beauty and grooming treatments, fitness programs with personal training, and luxury accommodation suites for wellness retreats.",
+          "Radiance Wellness Spa offers a comprehensive range of services including thermal bathing (sauna, steam room, hammam), massage therapy (Swedish, deep tissue, hot stone, and more), beauty and grooming treatments, fitness programs with personal training, and luxury accommodation suites for wellness retreats.",
       },
       {
         question: "Where are you located?",
@@ -49,7 +49,7 @@ const faqCategories = {
       {
         question: "How do I book an appointment?",
         answer:
-          "You can book an appointment through our online booking system on this website, by calling us at +234 800 123 4567, sending a WhatsApp message, or emailing bookings@radiancewellness.com. Online booking is the fastest way to secure your preferred slot.",
+          "You can book an appointment through our online booking system on this website, by calling us at +234 803 311 8603, sending a WhatsApp message, or emailing bookings@radiancewellness.com. Online booking is the fastest way to secure your preferred slot.",
       },
       {
         question: "Can I cancel or reschedule my booking?",
@@ -248,7 +248,7 @@ export default function FAQPage() {
               </Button>
               <Button variant="outline" asChild>
                 <a
-                  href="https://wa.me/2348001234567"
+                  href="https://wa.me/2348033118603"
                   target="_blank"
                   rel="noopener noreferrer"
                 >

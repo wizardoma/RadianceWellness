@@ -23,7 +23,7 @@ export default function TermsOfServicePage() {
                 1. Acceptance of Terms
               </h2>
               <p>
-                By accessing or using the Radiance Wellness Center website, mobile applications, or
+                By accessing or using the Radiance Wellness Spa website, mobile applications, or
                 any of our services, you agree to be bound by these Terms of Service. If you do not
                 agree with any part of these terms, you may not access or use our services. These
                 terms apply to all visitors, users, clients, and members of Radiance Wellness
@@ -37,7 +37,7 @@ export default function TermsOfServicePage() {
                 2. Services
               </h2>
               <p className="mb-3">
-                Radiance Wellness Center provides spa, wellness, and accommodation services. By
+                Radiance Wellness Spa provides spa, wellness, and accommodation services. By
                 booking any service through our platform, you agree to the following:
               </p>
               <ul className="list-disc pl-6 space-y-2">
@@ -101,7 +101,7 @@ export default function TermsOfServicePage() {
                 4. Accounts
               </h2>
               <p className="mb-3">
-                When you create an account with Radiance Wellness Center, you are responsible for:
+                When you create an account with Radiance Wellness Spa, you are responsible for:
               </p>
               <ul className="list-disc pl-6 space-y-2">
                 <li>
@@ -129,7 +129,7 @@ export default function TermsOfServicePage() {
                 5. Memberships
               </h2>
               <p className="mb-3">
-                Radiance Wellness Center offers membership plans with exclusive benefits:
+                Radiance Wellness Spa offers membership plans with exclusive benefits:
               </p>
               <ul className="list-disc pl-6 space-y-2">
                 <li>
@@ -160,7 +160,7 @@ export default function TermsOfServicePage() {
               </h2>
               <ul className="list-disc pl-6 space-y-2">
                 <li>
-                  Gift cards purchased through Radiance Wellness Center are non-refundable and
+                  Gift cards purchased through Radiance Wellness Spa are non-refundable and
                   cannot be exchanged for cash.
                 </li>
                 <li>
@@ -169,7 +169,7 @@ export default function TermsOfServicePage() {
                 </li>
                 <li>
                   Gift cards can be applied to any services or accommodations offered by Radiance
-                  Wellness Center.
+                  Wellness Spa.
                 </li>
                 <li>
                   Lost or stolen gift cards will not be replaced. Please treat your gift card like
@@ -204,7 +204,7 @@ export default function TermsOfServicePage() {
               </p>
               <ul className="list-disc pl-6 space-y-2">
                 <li>
-                  Radiance Wellness Center shall not be liable for any indirect, incidental,
+                  Radiance Wellness Spa shall not be liable for any indirect, incidental,
                   special, consequential, or punitive damages arising from your use of our services.
                 </li>
                 <li>
@@ -232,7 +232,7 @@ export default function TermsOfServicePage() {
                 us:
               </p>
               <div className="bg-gray-50 rounded-xl p-4 space-y-1 text-sm">
-                <p className="font-medium text-gray-900">Radiance Wellness Center</p>
+                <p className="font-medium text-gray-900">Radiance Wellness Spa</p>
                 <p>123 Wellness Boulevard, Maitama District</p>
                 <p>Abuja, FCT, Nigeria</p>
                 <p>Email: legal@radiancewellness.ng</p>

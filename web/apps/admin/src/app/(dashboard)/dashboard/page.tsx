@@ -95,7 +95,7 @@ export default function DashboardPage() {
             {isAdmin ? "Admin Dashboard" : "Welcome, Chidi!"}
           </h1>
           <p className="text-foreground-secondary mt-1">
-            {isAdmin ? "Overview of your wellness center" : "Here's your schedule for today"}
+            {isAdmin ? "Overview of your wellness spa" : "Here's your schedule for today"}
           </p>
         </div>
         <div className="flex gap-2">

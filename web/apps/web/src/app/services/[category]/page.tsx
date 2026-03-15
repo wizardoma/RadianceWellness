@@ -15,17 +15,18 @@ const serviceImages: Record<string, string> = {
   "hot-stone-massage": "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?q=80&w=800",
   "aromatherapy-massage": "https://images.unsplash.com/photo-1515377905703-c4788e51af15?q=80&w=800",
   "steam-bath": "https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=80&w=800",
-  "manicure-pedicure": "https://images.unsplash.com/photo-1604654894610-df63bc536371?q=80&w=800",
+  "manicure": "https://images.unsplash.com/photo-1604654894610-df63bc536371?q=80&w=800",
+  "pedicure": "https://images.unsplash.com/photo-1604654894610-df63bc536371?q=80&w=800",
   "hair-styling": "https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=800",
   "gym-access": "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=800",
   "aerobics-class": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=800",
 };
 
 const categoryImages: Record<string, string> = {
-  "thermal-bathing": "https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=80&w=2070",
-  "massage-therapy": "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?q=80&w=2070",
-  "beauty-grooming": "https://images.unsplash.com/photo-1560750588-73207b1ef5b8?q=80&w=2070",
-  "fitness": "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070",
+  spa: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=80&w=2070",
+  treatments: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?q=80&w=2070",
+  gym: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070",
+  salon: "https://images.unsplash.com/photo-1560750588-73207b1ef5b8?q=80&w=2070",
 };
 
 export function generateStaticParams() {
@@ -52,7 +53,7 @@ export default function CategoryPage({ params }: { params: { category: string } 
   }
 
   const categoryServices = getServicesByCategory(category.id);
-  const heroImage = categoryImages[category.id] || categoryImages["massage-therapy"];
+  const heroImage = categoryImages[category.id] || categoryImages["spa"];
 
   return (
     <div className="min-h-screen pt-20">

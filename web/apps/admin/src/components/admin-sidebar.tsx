@@ -29,7 +29,7 @@ import {
   UserCircle,
 } from "lucide-react";
 import { cn } from "@radiance/utils";
-import { Button, Badge } from "@radiance/ui";
+import { Button, Badge, LogoIcon } from "@radiance/ui";
 
 type UserRole = "admin" | "staff";
 
@@ -132,8 +132,8 @@ export function AdminSidebar() {
           {/* Logo */}
           <div className="p-6 border-b border-primary-800">
             <Link href="/dashboard" className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
-                <span className="text-white font-display text-xl font-bold">R</span>
+              <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center p-1">
+                <LogoIcon size={32} />
               </div>
               <div>
                 <span className="font-display text-lg font-semibold text-white block">

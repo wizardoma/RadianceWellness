@@ -163,7 +163,7 @@ export default function SettingsPage() {
 
   // Business info
   const [businessInfo, setBusinessInfo] = useState({
-    businessName: "Radiance Wellness Center",
+    businessName: "Radiance Wellness Spa",
     email: "hello@radiancewellness.com",
     phone: "+234 800 123 4567",
     whatsapp: "+234 800 123 4567",
@@ -395,7 +395,7 @@ export default function SettingsPage() {
             Settings
           </h1>
           <p className="text-foreground-secondary mt-1">
-            Configure your wellness center
+            Configure your wellness spa
           </p>
         </div>
         <Button onClick={handleSave} disabled={saveState === "saving"}>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LogoIcon } from "@radiance/ui";
 
 export default function AuthLayout({
   children,
@@ -11,8 +12,8 @@ export default function AuthLayout({
         {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center space-x-3">
-            <div className="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center">
-              <span className="text-white font-display text-2xl font-bold">R</span>
+            <div className="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center p-1">
+              <LogoIcon size={48} />
             </div>
           </Link>
           <h1 className="mt-4 font-display text-2xl font-bold text-white">
@@ -24,7 +25,7 @@ export default function AuthLayout({
         {children}
         
         <p className="text-center text-primary-300 text-sm mt-8">
-          © {new Date().getFullYear()} Radiance Wellness Center
+          © {new Date().getFullYear()} Radiance Wellness Spa
         </p>
       </div>
     </div>

@@ -11,14 +11,14 @@ import {
   Mail,
   Clock,
 } from "lucide-react";
-import { Button, Input } from "@radiance/ui";
+import { Button, Input, LogoIcon } from "@radiance/ui";
 
 const footerLinks = {
   services: [
-    { label: "Thermal & Bathing", href: "/services/thermal-bathing" },
-    { label: "Massage & Therapy", href: "/services/massage-therapy" },
-    { label: "Beauty & Grooming", href: "/services/beauty-grooming" },
-    { label: "Fitness", href: "/services/fitness" },
+    { label: "Spa", href: "/services/spa" },
+    { label: "Treatments", href: "/services/treatments" },
+    { label: "Gym", href: "/services/gym" },
+    { label: "Salon", href: "/services/salon" },
   ],
   company: [
     { label: "About Us", href: "/about" },
@@ -60,9 +60,7 @@ export function Footer() {
           {/* Brand Column */}
           <div className="lg:col-span-2">
             <Link href="/" className="flex items-center space-x-2 mb-6">
-              <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center">
-                <span className="text-primary-600 font-display text-xl font-bold">R</span>
-              </div>
+              <LogoIcon size={40} />
               <span className="font-display text-xl font-semibold text-white">
                 Radiance
               </span>
@@ -85,18 +83,18 @@ export function Footer() {
                 <span>1 Setif Close, Adzope Crescent, Off Kumasi Crescent, Wuse 2, Abuja</span>
               </a>
               <a
-                href="tel:+2348001234567"
+                href="tel:+2348033118603"
                 className="flex items-center text-sm text-primary-200 hover:text-white transition-colors"
               >
                 <Phone className="h-5 w-5 mr-3 flex-shrink-0" />
-                <span>+234 800 123 4567</span>
+                <span>+234 803 311 8603</span>
               </a>
               <a
-                href="mailto:hello@radiancewellness.com"
+                href="mailto:enquiries@radiancewellness.com"
                 className="flex items-center text-sm text-primary-200 hover:text-white transition-colors"
               >
                 <Mail className="h-5 w-5 mr-3 flex-shrink-0" />
-                <span>hello@radiancewellness.com</span>
+                <span>enquiries@radiancewellness.com</span>
               </a>
               <div className="flex items-start text-sm text-primary-200">
                 <Clock className="h-5 w-5 mr-3 mt-0.5 flex-shrink-0" />
@@ -203,7 +201,7 @@ export function Footer() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
             <p className="text-sm text-primary-300">
-              &copy; {new Date().getFullYear()} Radiance Wellness Center. All rights reserved.
+              &copy; {new Date().getFullYear()} Radiance Wellness Spa. All rights reserved.
             </p>
             <div className="flex space-x-6">
               {footerLinks.support.slice(1).map((link) => (

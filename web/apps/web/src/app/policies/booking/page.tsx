@@ -4,7 +4,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Booking Policy",
   description:
-    "Understand our booking, cancellation, and rescheduling policies at Radiance Wellness Center.",
+    "Understand our booking, cancellation, and rescheduling policies at Radiance Wellness Spa.",
 };
 
 export default function BookingPolicyPage() {
@@ -27,7 +27,7 @@ export default function BookingPolicyPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto prose prose-gray prose-headings:font-display prose-headings:text-primary-900 prose-a:text-primary-600 prose-a:no-underline hover:prose-a:underline">
             <p className="text-lg text-foreground-secondary leading-relaxed">
-              At Radiance Wellness Center, we want every visit to be seamless and
+              At Radiance Wellness Spa, we want every visit to be seamless and
               enjoyable. Please review our booking policy below to understand how
               reservations, cancellations, and rescheduling work. By making a
               booking with us, you agree to the terms outlined in this policy.
@@ -38,7 +38,7 @@ export default function BookingPolicyPage() {
             </h2>
             <p className="text-foreground-secondary leading-relaxed">
               Bookings can be made through our website, mobile app, by phone
-              (+234 800 123 4567), via WhatsApp, or by emailing
+              (+234 803 311 8603), via WhatsApp, or by emailing
               bookings@radiancewellness.com. We recommend booking at least 24
               hours in advance to ensure availability, especially during
               weekends and peak periods.

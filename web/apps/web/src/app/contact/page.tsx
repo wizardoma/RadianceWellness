@@ -39,19 +39,19 @@ const contactInfo = [
   {
     icon: Phone,
     title: "Call Us",
-    details: ["+234 800 123 4567", "+234 900 987 6543"],
+    details: ["+234 803 311 8603", "+234 900 987 6543"],
     action: {
       label: "Call Now",
-      href: "tel:+2348001234567",
+      href: "tel:+2348033118603",
     },
   },
   {
     icon: Mail,
     title: "Email Us",
-    details: ["hello@radiancewellness.com", "bookings@radiancewellness.com"],
+    details: ["enquiries@radiancewellness.com", "bookings@radiancewellness.com"],
     action: {
       label: "Send Email",
-      href: "mailto:hello@radiancewellness.com",
+      href: "mailto:enquiries@radiancewellness.com",
     },
   },
   {
@@ -387,7 +387,7 @@ export default function ContactPage() {
                       asChild
                     >
                       <a
-                        href="https://wa.me/2348001234567"
+                        href="https://wa.me/2348033118603"
                         target="_blank"
                         rel="noopener noreferrer"
                       >
@@ -465,7 +465,7 @@ export default function ContactPage() {
                 Have more questions?
               </p>
               <Button variant="outline" asChild>
-                <a href="mailto:hello@radiancewellness.com">
+                <a href="mailto:enquiries@radiancewellness.com">
                   <Mail className="h-4 w-4 mr-2" />
                   Email Our Support Team
                 </a>

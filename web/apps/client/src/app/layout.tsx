@@ -14,10 +14,10 @@ const playfair = Playfair_Display({
 
 export const metadata: Metadata = {
   title: {
-    default: "My Account | Radiance Wellness Center",
+    default: "My Account | Radiance Wellness Spa",
     template: "%s | Radiance Wellness",
   },
-  description: "Manage your wellness bookings at Radiance Wellness Center.",
+  description: "Manage your wellness bookings at Radiance Wellness Spa.",
 };
 
 export default function RootLayout({
