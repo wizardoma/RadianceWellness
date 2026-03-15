@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, Suspense } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft,
@@ -71,11 +72,30 @@ const timeSlots = [
 ];
 
 export default function BookingPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gradient-to-b from-primary-50 to-white pt-24 pb-16 flex items-center justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary-500 border-t-transparent" />
+        </div>
+      }
+    >
+      <BookingPageContent />
+    </Suspense>
+  );
+}
+
+function BookingPageContent() {
+  const searchParams = useSearchParams();
+  const preselectedServiceId = searchParams.get("service");
+  const preselectedDuration = searchParams.get("duration");
+  const preselectedAddons = searchParams.get("addons");
+
   const [currentStep, setCurrentStep] = useState<BookingStep>("service");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [bookingReference, setBookingReference] = useState<string | null>(null);
-  
+
   const [booking, setBooking] = useState<BookingState>({
     serviceId: null,
     duration: null,
@@ -90,6 +110,28 @@ export default function BookingPage() {
     selectedAddons: [],
     paymentMethod: "paystack",
   });
+
+  // Pre-select service from URL query params
+  useEffect(() => {
+    if (preselectedServiceId) {
+      const service = services.find((s) => s.id === preselectedServiceId);
+      if (service) {
+        const duration = preselectedDuration
+          ? Number(preselectedDuration)
+          : service.duration[0];
+        const addonIds = preselectedAddons
+          ? preselectedAddons.split(",").filter(Boolean)
+          : [];
+        setBooking((prev) => ({
+          ...prev,
+          serviceId: service.id,
+          duration: service.duration.includes(duration) ? duration : service.duration[0],
+          selectedAddons: addonIds,
+        }));
+        setSelectedCategory(service.category);
+      }
+    }
+  }, [preselectedServiceId, preselectedDuration, preselectedAddons]);
 
   const selectedService = useMemo(() => {
     return services.find((s) => s.id === booking.serviceId);

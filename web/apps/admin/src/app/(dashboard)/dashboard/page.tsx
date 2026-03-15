@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { 
-  Calendar, 
-  Users, 
+import { useRouter } from "next/navigation";
+import {
+  Calendar,
+  Users,
   DollarSign,
   TrendingUp,
   Clock,
@@ -14,6 +15,14 @@ import {
   ArrowRight,
   ArrowUpRight,
   ArrowDownRight,
+  Plus,
+  UserPlus,
+  ShoppingBag,
+  Package,
+  CalendarOff,
+  User,
+  Star,
+  Timer,
 } from "lucide-react";
 import { Button, Card, CardContent, CardHeader, CardTitle, Badge } from "@radiance/ui";
 import { formatCurrency } from "@radiance/utils";
@@ -37,6 +46,18 @@ const recentCustomers = [
   { name: "Adaora Nwachukwu", email: "adaora@email.com", visits: 3, lastVisit: "Yesterday" },
 ];
 
+const weeklyRevenue = [
+  { day: "Mon", amount: 380000 },
+  { day: "Tue", amount: 425000 },
+  { day: "Wed", amount: 395000 },
+  { day: "Thu", amount: 510000 },
+  { day: "Fri", amount: 485000 },
+  { day: "Sat", amount: 620000 },
+  { day: "Sun", amount: 340000 },
+];
+
+const maxRevenue = Math.max(...weeklyRevenue.map(d => d.amount));
+
 const getStatusBadge = (status: string) => {
   switch (status) {
     case "completed":
@@ -55,6 +76,7 @@ const getStatusBadge = (status: string) => {
 };
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [userRole, setUserRole] = useState<UserRole>("admin");
 
   useEffect(() => {
@@ -78,8 +100,10 @@ export default function DashboardPage() {
         </div>
         <div className="flex gap-2">
           {isAdmin && (
-            <Button variant="outline">
-              Download Report
+            <Button variant="outline" asChild>
+              <Link href="/reports">
+                Download Report
+              </Link>
             </Button>
           )}
           <Button asChild>
@@ -110,7 +134,7 @@ export default function DashboardPage() {
               </div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -167,28 +191,114 @@ export default function DashboardPage() {
         </div>
       )}
 
+      {/* Quick Actions - Admin Only */}
+      {isAdmin && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Quick Actions</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <Link
+                href="/bookings"
+                className="flex flex-col items-center gap-3 p-4 bg-white border border-border rounded-xl hover:shadow-md transition-shadow cursor-pointer"
+              >
+                <div className="p-3 bg-primary-100 rounded-xl">
+                  <Plus className="h-6 w-6 text-primary-600" />
+                </div>
+                <span className="text-sm font-medium text-gray-900">+ New Booking</span>
+              </Link>
+              <Link
+                href="/check-in?walkin=true"
+                className="flex flex-col items-center gap-3 p-4 bg-white border border-border rounded-xl hover:shadow-md transition-shadow cursor-pointer"
+              >
+                <div className="p-3 bg-green-100 rounded-xl">
+                  <UserPlus className="h-6 w-6 text-green-600" />
+                </div>
+                <span className="text-sm font-medium text-gray-900">Walk-in Customer</span>
+              </Link>
+              <Link
+                href="/products"
+                className="flex flex-col items-center gap-3 p-4 bg-white border border-border rounded-xl hover:shadow-md transition-shadow cursor-pointer"
+              >
+                <div className="p-3 bg-accent-100 rounded-xl">
+                  <ShoppingBag className="h-6 w-6 text-accent-600" />
+                </div>
+                <span className="text-sm font-medium text-gray-900">View Products</span>
+              </Link>
+              <Link
+                href="/inventory"
+                className="flex flex-col items-center gap-3 p-4 bg-white border border-border rounded-xl hover:shadow-md transition-shadow cursor-pointer"
+              >
+                <div className="p-3 bg-amber-100 rounded-xl">
+                  <Package className="h-6 w-6 text-amber-600" />
+                </div>
+                <span className="text-sm font-medium text-gray-900">Inventory Alerts</span>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Staff Quick Stats */}
+      {!isAdmin && (() => {
+        const myBookings = todaysBookings.filter(b => b.therapist === "Chidi Eze");
+        const totalAppointments = myBookings.length;
+        const completedCount = myBookings.filter(b => b.status === "completed").length;
+        const remainingCount = totalAppointments - completedCount;
+        return (
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <Card className="bg-primary-50 border-primary-200">
+              <CardContent className="p-6 text-center">
+                <p className="text-3xl font-bold text-primary-700">{totalAppointments}</p>
+                <p className="text-sm text-primary-600">Appointments Today</p>
+              </CardContent>
+            </Card>
+            <Card className="bg-green-50 border-green-200">
+              <CardContent className="p-6 text-center">
+                <p className="text-3xl font-bold text-green-700">{completedCount}</p>
+                <p className="text-sm text-green-600">Completed</p>
+              </CardContent>
+            </Card>
+            <Card className="bg-accent-50 border-accent-200">
+              <CardContent className="p-6 text-center">
+                <p className="text-3xl font-bold text-accent-700">{remainingCount}</p>
+                <p className="text-sm text-accent-600">Remaining</p>
+              </CardContent>
+            </Card>
+          </div>
+        );
+      })()}
+
+      {/* Quick Actions - Staff Only */}
       {!isAdmin && (
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <Card className="bg-primary-50 border-primary-200">
-            <CardContent className="p-6 text-center">
-              <p className="text-3xl font-bold text-primary-700">6</p>
-              <p className="text-sm text-primary-600">Appointments Today</p>
-            </CardContent>
-          </Card>
-          <Card className="bg-green-50 border-green-200">
-            <CardContent className="p-6 text-center">
-              <p className="text-3xl font-bold text-green-700">2</p>
-              <p className="text-sm text-green-600">Completed</p>
-            </CardContent>
-          </Card>
-          <Card className="bg-accent-50 border-accent-200">
-            <CardContent className="p-6 text-center">
-              <p className="text-3xl font-bold text-accent-700">4</p>
-              <p className="text-sm text-accent-600">Remaining</p>
-            </CardContent>
-          </Card>
-        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>Quick Actions</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-4">
+              <Link
+                href="/my-profile"
+                className="flex flex-col items-center gap-3 p-4 bg-white border border-border rounded-xl hover:shadow-md transition-shadow cursor-pointer"
+              >
+                <div className="p-3 bg-primary-100 rounded-xl">
+                  <User className="h-6 w-6 text-primary-600" />
+                </div>
+                <span className="text-sm font-medium text-gray-900">My Profile</span>
+              </Link>
+              <Link
+                href="/check-in"
+                className="flex flex-col items-center gap-3 p-4 bg-white border border-border rounded-xl hover:shadow-md transition-shadow cursor-pointer"
+              >
+                <div className="p-3 bg-green-100 rounded-xl">
+                  <CheckCircle className="h-6 w-6 text-green-600" />
+                </div>
+                <span className="text-sm font-medium text-gray-900">Check-In Station</span>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
       )}
 
       <div className="grid lg:grid-cols-3 gap-6">
@@ -226,7 +336,11 @@ export default function DashboardPage() {
                     <div className="flex items-center gap-2">
                       {getStatusBadge(booking.status)}
                       {booking.status === "upcoming" && (
-                        <Button size="sm" variant="outline">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => router.push("/check-in")}
+                        >
                           Check In
                         </Button>
                       )}
@@ -271,6 +385,86 @@ export default function DashboardPage() {
         )}
       </div>
 
+      {/* Personal Performance - Staff Only */}
+      {!isAdmin && (
+        <Card>
+          <CardHeader>
+            <CardTitle>My Performance This Week</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="p-4 bg-primary-50 rounded-xl text-center">
+                <div className="flex justify-center mb-2">
+                  <div className="p-2 bg-primary-100 rounded-lg">
+                    <CheckCircle className="h-5 w-5 text-primary-600" />
+                  </div>
+                </div>
+                <p className="text-2xl font-bold text-primary-700">18</p>
+                <p className="text-sm text-primary-600">Bookings Completed</p>
+              </div>
+
+              <div className="p-4 bg-green-50 rounded-xl text-center">
+                <div className="flex justify-center mb-2">
+                  <div className="p-2 bg-green-100 rounded-lg">
+                    <DollarSign className="h-5 w-5 text-green-600" />
+                  </div>
+                </div>
+                <p className="text-2xl font-bold text-green-700">{formatCurrency(540000)}</p>
+                <p className="text-sm text-green-600">Revenue Generated</p>
+              </div>
+
+              <div className="p-4 bg-amber-50 rounded-xl text-center">
+                <div className="flex justify-center mb-2">
+                  <div className="p-2 bg-amber-100 rounded-lg">
+                    <Star className="h-5 w-5 text-amber-600" />
+                  </div>
+                </div>
+                <p className="text-2xl font-bold text-amber-700">4.9</p>
+                <p className="text-sm text-amber-600">Customer Rating</p>
+              </div>
+
+              <div className="p-4 bg-purple-50 rounded-xl text-center">
+                <div className="flex justify-center mb-2">
+                  <div className="p-2 bg-purple-100 rounded-lg">
+                    <Timer className="h-5 w-5 text-purple-600" />
+                  </div>
+                </div>
+                <p className="text-2xl font-bold text-purple-700">96%</p>
+                <p className="text-sm text-purple-600">On-Time Rate</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Revenue Trend - Admin Only */}
+      {isAdmin && (
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle>Revenue Trend (Last 7 Days)</CardTitle>
+            <Link href="/reports" className="text-sm text-primary-600 hover:text-primary-700 flex items-center">
+              Full Report <ArrowRight className="h-4 w-4 ml-1" />
+            </Link>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-end justify-between gap-3 h-48">
+              {weeklyRevenue.map((day) => (
+                <div key={day.day} className="flex flex-col items-center flex-1 gap-2">
+                  <span className="text-xs font-medium text-gray-600">
+                    {formatCurrency(day.amount)}
+                  </span>
+                  <div
+                    className="w-full bg-primary-500 rounded-t-lg min-h-[8px] transition-all"
+                    style={{ height: `${(day.amount / maxRevenue) * 160}px` }}
+                  />
+                  <span className="text-sm font-medium text-gray-700">{day.day}</span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Alerts - Admin Only */}
       {isAdmin && (
         <Card className="border-amber-200 bg-amber-50">
@@ -283,11 +477,15 @@ export default function DashboardPage() {
                   3 bookings are pending confirmation. 2 customers have outstanding balances.
                 </p>
                 <div className="mt-2 flex gap-2">
-                  <Button size="sm" variant="outline" className="border-amber-300 text-amber-700 hover:bg-amber-100">
-                    View Pending
+                  <Button size="sm" variant="outline" className="border-amber-300 text-amber-700 hover:bg-amber-100" asChild>
+                    <Link href="/bookings">
+                      View Pending
+                    </Link>
                   </Button>
-                  <Button size="sm" variant="outline" className="border-amber-300 text-amber-700 hover:bg-amber-100">
-                    View Balances
+                  <Button size="sm" variant="outline" className="border-amber-300 text-amber-700 hover:bg-amber-100" asChild>
+                    <Link href="/payments">
+                      View Balances
+                    </Link>
                   </Button>
                 </div>
               </div>

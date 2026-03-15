@@ -13,6 +13,11 @@ import {
   Sparkles,
   Search,
   Filter,
+  Lock,
+  CreditCard,
+  Building2,
+  Wallet,
+  Loader2,
 } from "lucide-react";
 import {
   Button,
@@ -27,7 +32,8 @@ import {
 import { services, serviceCategories, addOns as addons } from "@radiance/mock-data";
 import { formatCurrency } from "@radiance/utils";
 
-type BookingStep = "service" | "datetime" | "addons" | "confirm";
+type BookingStep = "service" | "datetime" | "addons" | "payment" | "confirm";
+type PaymentMethod = "card" | "bank_transfer" | "pay_later";
 
 interface BookingState {
   serviceId: string | null;
@@ -39,10 +45,11 @@ interface BookingState {
 }
 
 const steps = [
-  { id: "service", label: "Select Service" },
+  { id: "service", label: "Service" },
   { id: "datetime", label: "Date & Time" },
   { id: "addons", label: "Add-ons" },
-  { id: "confirm", label: "Confirm" },
+  { id: "payment", label: "Payment" },
+  { id: "confirm", label: "Confirmation" },
 ];
 
 const timeSlots = [
@@ -51,6 +58,9 @@ const timeSlots = [
   "16:00", "16:30", "17:00", "17:30", "18:00", "18:30",
 ];
 
+const MEMBERSHIP_DISCOUNT = 0.15;
+const TAX_RATE = 0.075;
+
 export default function BookServicePage() {
   const [currentStep, setCurrentStep] = useState<BookingStep>("service");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -58,7 +68,14 @@ export default function BookServicePage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [bookingComplete, setBookingComplete] = useState(false);
   const [bookingRef, setBookingRef] = useState("");
-  
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("card");
+  const [cardDetails, setCardDetails] = useState({
+    number: "",
+    expiry: "",
+    cvv: "",
+    name: "",
+  });
+
   const [booking, setBooking] = useState<BookingState>({
     serviceId: null,
     duration: null,
@@ -84,7 +101,11 @@ export default function BookServicePage() {
     }, 0);
   }, [booking.selectedAddons]);
 
-  const totalPrice = servicePrice + addonsTotal;
+  const subtotal = servicePrice + addonsTotal;
+  const membershipDiscount = Math.round(subtotal * MEMBERSHIP_DISCOUNT);
+  const discountedSubtotal = subtotal - membershipDiscount;
+  const tax = Math.round(discountedSubtotal * TAX_RATE);
+  const totalPrice = discountedSubtotal + tax;
 
   const filteredServices = useMemo(() => {
     let result = services;
@@ -92,7 +113,7 @@ export default function BookServicePage() {
       result = result.filter((s) => s.category === selectedCategory);
     }
     if (searchQuery) {
-      result = result.filter((s) => 
+      result = result.filter((s) =>
         s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         s.shortDescription.toLowerCase().includes(searchQuery.toLowerCase())
       );
@@ -127,8 +148,9 @@ export default function BookServicePage() {
     return ref;
   };
 
+  const stepOrder: BookingStep[] = ["service", "datetime", "addons", "payment", "confirm"];
+
   const nextStep = () => {
-    const stepOrder: BookingStep[] = ["service", "datetime", "addons", "confirm"];
     const currentIndex = stepOrder.indexOf(currentStep);
     if (currentIndex < stepOrder.length - 1) {
       setCurrentStep(stepOrder[currentIndex + 1]);
@@ -136,19 +158,22 @@ export default function BookServicePage() {
   };
 
   const prevStep = () => {
-    const stepOrder: BookingStep[] = ["service", "datetime", "addons", "confirm"];
     const currentIndex = stepOrder.indexOf(currentStep);
     if (currentIndex > 0) {
       setCurrentStep(stepOrder[currentIndex - 1]);
     }
   };
 
-  const handleConfirm = async () => {
+  const handlePaymentConfirm = async () => {
     setIsProcessing(true);
     await new Promise((resolve) => setTimeout(resolve, 2000));
     setBookingRef(generateBookingRef());
-    setBookingComplete(true);
     setIsProcessing(false);
+    nextStep();
+  };
+
+  const handleFinish = () => {
+    setBookingComplete(true);
   };
 
   const isStepComplete = (step: BookingStep): boolean => {
@@ -159,10 +184,87 @@ export default function BookServicePage() {
         return !!booking.date && !!booking.time;
       case "addons":
         return true;
+      case "payment":
+        return true;
       default:
         return false;
     }
   };
+
+  const getPaymentLabel = () => {
+    switch (paymentMethod) {
+      case "card":
+        return `Card ending in ****4242`;
+      case "bank_transfer":
+        return "Bank Transfer (Pending)";
+      case "pay_later":
+        return "Pay at Center";
+    }
+  };
+
+  const getPaymentStatusDisplay = () => {
+    switch (paymentMethod) {
+      case "card":
+        return (
+          <span className="inline-flex items-center gap-1 text-sm font-medium text-green-600">
+            Payment Successful <Check className="h-4 w-4" />
+          </span>
+        );
+      case "bank_transfer":
+        return (
+          <span className="text-sm font-medium text-amber-600">
+            Payment: Awaiting Confirmation
+          </span>
+        );
+      case "pay_later":
+        return (
+          <span className="text-sm font-medium text-blue-600">
+            Payment: Due on Arrival
+          </span>
+        );
+    }
+  };
+
+  const OrderSummaryCard = () => (
+    <div className="bg-gray-50 rounded-xl p-5 space-y-3">
+      <h4 className="font-semibold text-sm text-foreground-muted uppercase tracking-wide">Order Summary</h4>
+      <div className="space-y-2 text-sm">
+        <div className="flex justify-between">
+          <span>{selectedService?.name} ({booking.duration} min)</span>
+          <span>{formatCurrency(servicePrice)}</span>
+        </div>
+        {booking.selectedAddons.map((addonId) => {
+          const addon = addons.find((a) => a.id === addonId);
+          return addon ? (
+            <div key={addonId} className="flex justify-between text-foreground-muted">
+              <span>+ {addon.name}</span>
+              <span>{formatCurrency(addon.price)}</span>
+            </div>
+          ) : null;
+        })}
+      </div>
+      <Separator />
+      <div className="space-y-2 text-sm">
+        <div className="flex justify-between">
+          <span>Subtotal</span>
+          <span>{formatCurrency(subtotal)}</span>
+        </div>
+        <div className="flex justify-between text-green-600">
+          <span>Gold Membership (-15%)</span>
+          <span>-{formatCurrency(membershipDiscount)}</span>
+        </div>
+        <div className="flex justify-between text-foreground-muted">
+          <span>Tax (7.5%)</span>
+          <span>{formatCurrency(tax)}</span>
+        </div>
+      </div>
+      <Separator />
+      <div className="flex justify-between font-bold text-lg">
+        <span>Total</span>
+        <span className="text-primary-600">{formatCurrency(totalPrice)}</span>
+      </div>
+    </div>
+  );
 
   if (bookingComplete) {
     return (
@@ -203,6 +305,13 @@ export default function BookServicePage() {
                 <span className="text-foreground-muted">Time</span>
                 <span className="font-medium">{booking.time}</span>
               </div>
+              <div className="flex justify-between">
+                <span className="text-foreground-muted">Payment</span>
+                <span className="font-medium">{getPaymentLabel()}</span>
+              </div>
+              <div className="flex justify-end">
+                {getPaymentStatusDisplay()}
+              </div>
               <Separator />
               <div className="flex justify-between text-lg">
                 <span className="font-medium">Total</span>
@@ -214,7 +323,7 @@ export default function BookServicePage() {
               <Button asChild>
                 <Link href="/bookings">View My Bookings</Link>
               </Button>
-              <Button 
+              <Button
                 variant="outline"
                 onClick={() => {
                   setBookingComplete(false);
@@ -227,6 +336,9 @@ export default function BookServicePage() {
                     selectedAddons: [],
                     notes: "",
                   });
+                  setPaymentMethod("card");
+                  setCardDetails({ number: "", expiry: "", cvv: "", name: "" });
+                  setBookingRef("");
                 }}
               >
                 Book Another Service
@@ -251,7 +363,7 @@ export default function BookServicePage() {
       </div>
 
       {/* Progress Steps */}
-      <div className="flex items-center justify-between max-w-2xl">
+      <div className="flex items-center justify-between max-w-3xl">
         {steps.map((step, index) => {
           const isActive = currentStep === step.id;
           const isCompleted = steps.findIndex((s) => s.id === currentStep) > index;
@@ -274,7 +386,7 @@ export default function BookServicePage() {
                 </span>
               </div>
               {index < steps.length - 1 && (
-                <div className={`w-12 sm:w-20 h-0.5 mx-2 ${isCompleted ? "bg-primary-500" : "bg-gray-200"}`} />
+                <div className={`w-8 sm:w-16 h-0.5 mx-1 sm:mx-2 ${isCompleted ? "bg-primary-500" : "bg-gray-200"}`} />
               )}
             </div>
           );
@@ -357,7 +469,7 @@ export default function BookServicePage() {
                           </p>
                           <div className="flex items-center gap-4 mt-2 text-sm text-foreground-muted">
                             <span><Clock className="h-3.5 w-3.5 inline mr-1" />{service.duration.join("/")} min</span>
-                            <span>★ {service.rating}</span>
+                            <span>&#9733; {service.rating}</span>
                           </div>
                         </div>
                         <div className="text-right">
@@ -505,13 +617,223 @@ export default function BookServicePage() {
             </Card>
           )}
 
-          {/* Step 4: Confirm */}
+          {/* Step 4: Payment */}
+          {currentStep === "payment" && (
+            <>
+              {/* Processing overlay */}
+              {isProcessing && (
+                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+                  <div className="bg-white rounded-2xl p-8 flex flex-col items-center gap-4 shadow-xl">
+                    <Loader2 className="h-10 w-10 text-primary-500 animate-spin" />
+                    <p className="text-lg font-medium text-gray-900">Processing payment...</p>
+                    <p className="text-sm text-foreground-muted">Please do not close this page</p>
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-6">
+                {/* Order Summary - shown on top for mobile, hidden on lg (shown in sidebar) */}
+                <div className="lg:hidden">
+                  <Card>
+                    <CardContent className="pt-6">
+                      <OrderSummaryCard />
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Payment Method Selection */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Payment Method</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {/* Card Payment */}
+                    <div
+                      className={`rounded-xl border-2 transition-all cursor-pointer ${
+                        paymentMethod === "card"
+                          ? "border-primary-500 bg-primary-50/50"
+                          : "border-border hover:border-primary-300"
+                      }`}
+                      onClick={() => setPaymentMethod("card")}
+                    >
+                      <div className="flex items-center gap-3 p-4">
+                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                          paymentMethod === "card" ? "border-primary-500" : "border-gray-300"
+                        }`}>
+                          {paymentMethod === "card" && (
+                            <div className="w-2.5 h-2.5 rounded-full bg-primary-500" />
+                          )}
+                        </div>
+                        <CreditCard className="h-5 w-5 text-foreground-muted" />
+                        <span className="font-medium">Card Payment</span>
+                      </div>
+
+                      {paymentMethod === "card" && (
+                        <div className="px-4 pb-4 space-y-3" onClick={(e) => e.stopPropagation()}>
+                          <div>
+                            <label className="text-sm text-foreground-muted mb-1 block">Card Number</label>
+                            <Input
+                              placeholder="0000 0000 0000 0000"
+                              value={cardDetails.number}
+                              onChange={(e) => setCardDetails({ ...cardDetails, number: e.target.value })}
+                            />
+                          </div>
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <label className="text-sm text-foreground-muted mb-1 block">Expiry Date</label>
+                              <Input
+                                placeholder="MM/YY"
+                                value={cardDetails.expiry}
+                                onChange={(e) => setCardDetails({ ...cardDetails, expiry: e.target.value })}
+                              />
+                            </div>
+                            <div>
+                              <label className="text-sm text-foreground-muted mb-1 block">CVV</label>
+                              <Input
+                                placeholder="123"
+                                type="password"
+                                value={cardDetails.cvv}
+                                onChange={(e) => setCardDetails({ ...cardDetails, cvv: e.target.value })}
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <label className="text-sm text-foreground-muted mb-1 block">Cardholder Name</label>
+                            <Input
+                              placeholder="Full name on card"
+                              value={cardDetails.name}
+                              onChange={(e) => setCardDetails({ ...cardDetails, name: e.target.value })}
+                            />
+                          </div>
+                          <div className="flex items-center gap-1.5 text-xs text-foreground-muted pt-1">
+                            <Lock className="h-3 w-3" />
+                            <span>Secured by Paystack</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Bank Transfer */}
+                    <div
+                      className={`rounded-xl border-2 transition-all cursor-pointer ${
+                        paymentMethod === "bank_transfer"
+                          ? "border-primary-500 bg-primary-50/50"
+                          : "border-border hover:border-primary-300"
+                      }`}
+                      onClick={() => setPaymentMethod("bank_transfer")}
+                    >
+                      <div className="flex items-center gap-3 p-4">
+                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                          paymentMethod === "bank_transfer" ? "border-primary-500" : "border-gray-300"
+                        }`}>
+                          {paymentMethod === "bank_transfer" && (
+                            <div className="w-2.5 h-2.5 rounded-full bg-primary-500" />
+                          )}
+                        </div>
+                        <Building2 className="h-5 w-5 text-foreground-muted" />
+                        <span className="font-medium">Bank Transfer</span>
+                      </div>
+
+                      {paymentMethod === "bank_transfer" && (
+                        <div className="px-4 pb-4" onClick={(e) => e.stopPropagation()}>
+                          <div className="bg-white rounded-lg border p-4 space-y-2">
+                            <div className="flex justify-between text-sm">
+                              <span className="text-foreground-muted">Bank</span>
+                              <span className="font-medium">Guaranty Trust Bank</span>
+                            </div>
+                            <div className="flex justify-between text-sm">
+                              <span className="text-foreground-muted">Account Number</span>
+                              <span className="font-mono font-medium">0123456789</span>
+                            </div>
+                            <div className="flex justify-between text-sm">
+                              <span className="text-foreground-muted">Account Name</span>
+                              <span className="font-medium">Radiance Wellness Center</span>
+                            </div>
+                          </div>
+                          <p className="text-xs text-foreground-muted mt-3">
+                            Transfer the exact amount and click &quot;I&apos;ve Made the Transfer&quot; to confirm.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Pay Later */}
+                    <div
+                      className={`rounded-xl border-2 transition-all cursor-pointer ${
+                        paymentMethod === "pay_later"
+                          ? "border-primary-500 bg-primary-50/50"
+                          : "border-border hover:border-primary-300"
+                      }`}
+                      onClick={() => setPaymentMethod("pay_later")}
+                    >
+                      <div className="flex items-center gap-3 p-4">
+                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                          paymentMethod === "pay_later" ? "border-primary-500" : "border-gray-300"
+                        }`}>
+                          {paymentMethod === "pay_later" && (
+                            <div className="w-2.5 h-2.5 rounded-full bg-primary-500" />
+                          )}
+                        </div>
+                        <Wallet className="h-5 w-5 text-foreground-muted" />
+                        <span className="font-medium">Pay Later</span>
+                      </div>
+
+                      {paymentMethod === "pay_later" && (
+                        <div className="px-4 pb-4">
+                          <p className="text-sm text-foreground-muted">
+                            Pay at the center on arrival. Your booking will be reserved.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Payment Action Button */}
+                <div className="flex justify-between">
+                  <Button variant="outline" onClick={prevStep}>
+                    <ArrowLeft className="h-4 w-4 mr-2" />
+                    Back
+                  </Button>
+
+                  {paymentMethod === "card" && (
+                    <Button onClick={handlePaymentConfirm} disabled={isProcessing}>
+                      <Lock className="h-4 w-4 mr-2" />
+                      Pay {formatCurrency(totalPrice)}
+                    </Button>
+                  )}
+                  {paymentMethod === "bank_transfer" && (
+                    <Button onClick={handlePaymentConfirm} disabled={isProcessing}>
+                      I&apos;ve Made the Transfer
+                    </Button>
+                  )}
+                  {paymentMethod === "pay_later" && (
+                    <Button onClick={handlePaymentConfirm} disabled={isProcessing}>
+                      Confirm Booking
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Step 5: Confirmation */}
           {currentStep === "confirm" && (
             <Card>
               <CardHeader>
-                <CardTitle>Confirm Your Booking</CardTitle>
+                <CardTitle>Booking Confirmed</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
+                <div className="flex items-center gap-3 p-4 bg-green-50 rounded-xl border border-green-200">
+                  <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                    <Check className="h-5 w-5 text-green-600" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-green-800">Your booking is confirmed!</p>
+                    <p className="text-sm text-green-600">Reference: {bookingRef}</p>
+                  </div>
+                </div>
+
                 <div className="bg-gray-50 rounded-xl p-6 space-y-4">
                   <div className="flex justify-between">
                     <span className="text-foreground-muted">Service</span>
@@ -536,7 +858,7 @@ export default function BookServicePage() {
                     <span className="text-foreground-muted">Time</span>
                     <span className="font-medium">{booking.time}</span>
                   </div>
-                  
+
                   {booking.selectedAddons.length > 0 && (
                     <>
                       <Separator />
@@ -558,6 +880,31 @@ export default function BookServicePage() {
                   )}
 
                   <Separator />
+
+                  <div className="flex justify-between">
+                    <span className="text-foreground-muted">Payment</span>
+                    <span className="font-medium">{getPaymentLabel()}</span>
+                  </div>
+                  <div className="flex justify-end">
+                    {getPaymentStatusDisplay()}
+                  </div>
+
+                  <Separator />
+
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span>Subtotal</span>
+                      <span>{formatCurrency(subtotal)}</span>
+                    </div>
+                    <div className="flex justify-between text-green-600">
+                      <span>Gold Membership (-15%)</span>
+                      <span>-{formatCurrency(membershipDiscount)}</span>
+                    </div>
+                    <div className="flex justify-between text-foreground-muted">
+                      <span>Tax (7.5%)</span>
+                      <span>{formatCurrency(tax)}</span>
+                    </div>
+                  </div>
                   <div className="flex justify-between text-lg">
                     <span className="font-semibold">Total</span>
                     <span className="font-bold text-primary-600">{formatCurrency(totalPrice)}</span>
@@ -566,38 +913,34 @@ export default function BookServicePage() {
 
                 <div className="bg-primary-50 border border-primary-200 rounded-lg p-4">
                   <p className="text-sm text-primary-700">
-                    <strong>Gold Member Discount:</strong> You're saving 15% on this booking!
+                    <strong>Gold Member Discount:</strong> You saved {formatCurrency(membershipDiscount)} on this booking!
                   </p>
+                </div>
+
+                <div className="flex justify-center">
+                  <Button onClick={handleFinish}>
+                    View My Bookings
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </Button>
                 </div>
               </CardContent>
             </Card>
           )}
 
-          {/* Navigation */}
-          <div className="flex justify-between mt-6">
-            <Button variant="outline" onClick={prevStep} disabled={currentStep === "service"}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back
-            </Button>
-
-            {currentStep === "confirm" ? (
-              <Button onClick={handleConfirm} disabled={isProcessing}>
-                {isProcessing ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />
-                    Processing...
-                  </>
-                ) : (
-                  <>Confirm Booking - {formatCurrency(totalPrice)}</>
-                )}
+          {/* Navigation - shown for steps 1-3 only (payment has its own buttons, confirm has its own) */}
+          {(currentStep === "service" || currentStep === "datetime" || currentStep === "addons") && (
+            <div className="flex justify-between mt-6">
+              <Button variant="outline" onClick={prevStep} disabled={currentStep === "service"}>
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back
               </Button>
-            ) : (
+
               <Button onClick={nextStep} disabled={!isStepComplete(currentStep)}>
                 Continue
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
         {/* Sidebar Summary */}
@@ -650,9 +993,30 @@ export default function BookServicePage() {
 
                   <Separator />
 
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span>Subtotal</span>
+                      <span>{formatCurrency(subtotal)}</span>
+                    </div>
+                    <div className="flex justify-between text-green-600">
+                      <span>Discount (-15%)</span>
+                      <span>-{formatCurrency(membershipDiscount)}</span>
+                    </div>
+                    <div className="flex justify-between text-foreground-muted">
+                      <span>Tax (7.5%)</span>
+                      <span>{formatCurrency(tax)}</span>
+                    </div>
+                  </div>
+
+                  <Separator />
+
                   <div className="flex justify-between font-bold">
                     <span>Total</span>
                     <span className="text-primary-600">{formatCurrency(totalPrice)}</span>
+                  </div>
+
+                  <div className="bg-green-50 rounded-lg p-2.5 text-xs text-green-700 text-center">
+                    Gold Member: Saving {formatCurrency(membershipDiscount)}
                   </div>
                 </div>
               ) : (

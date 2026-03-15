@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { User, Mail, Phone, MapPin, Calendar, Camera, Save } from "lucide-react";
-import { 
-  Button, 
-  Card, 
-  CardContent, 
-  CardHeader, 
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
   CardTitle,
   Input,
   Label,
@@ -15,6 +16,12 @@ import {
   TabsList,
   TabsTrigger,
   TabsContent,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
 } from "@radiance/ui";
 
 // Mock user data
@@ -35,15 +42,75 @@ const mockUser = {
 };
 
 export default function ProfilePage() {
+  const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [formData, setFormData] = useState(mockUser);
+
+  // Avatar upload
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [photoFeedback, setPhotoFeedback] = useState(false);
+
+  // Password state
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [passwordErrors, setPasswordErrors] = useState<Record<string, string>>({});
+  const [passwordSuccess, setPasswordSuccess] = useState(false);
+
+  // Delete account dialog
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
 
   const handleSave = async () => {
     setIsSaving(true);
     await new Promise((resolve) => setTimeout(resolve, 1000));
     setIsSaving(false);
     setIsEditing(false);
+  };
+
+  const handleAvatarClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setPhotoFeedback(true);
+      setTimeout(() => setPhotoFeedback(false), 2500);
+      // Reset file input so the same file can be selected again
+      e.target.value = "";
+    }
+  };
+
+  const handleUpdatePassword = () => {
+    const errors: Record<string, string> = {};
+
+    if (!passwordData.currentPassword) {
+      errors.currentPassword = "Current password is required";
+    }
+    if (passwordData.newPassword.length < 8) {
+      errors.newPassword = "New password must be at least 8 characters";
+    }
+    if (passwordData.confirmPassword !== passwordData.newPassword) {
+      errors.confirmPassword = "Passwords do not match";
+    }
+
+    setPasswordErrors(errors);
+
+    if (Object.keys(errors).length === 0) {
+      setPasswordSuccess(true);
+      setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" });
+      setTimeout(() => setPasswordSuccess(false), 3000);
+    }
+  };
+
+  const handleDeleteAccount = () => {
+    setDeleteDialogOpen(false);
+    setDeleteConfirmText("");
+    router.push("/login");
   };
 
   return (
@@ -96,16 +163,35 @@ export default function ProfilePage() {
                   </span>
                 </div>
                 {isEditing && (
-                  <button className="absolute bottom-0 right-0 w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center text-white shadow-lg">
-                    <Camera className="h-4 w-4" />
-                  </button>
+                  <>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      className="hidden"
+                    />
+                    <button
+                      onClick={handleAvatarClick}
+                      className="absolute bottom-0 right-0 w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center text-white shadow-lg hover:bg-primary-600 transition-colors"
+                    >
+                      <Camera className="h-4 w-4" />
+                    </button>
+                  </>
+                )}
+                {photoFeedback && (
+                  <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap">
+                    <span className="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">
+                      Photo updated
+                    </span>
+                  </div>
                 )}
               </div>
               <h2 className="mt-4 font-display text-xl font-semibold text-gray-900">
                 {formData.firstName} {formData.lastName}
               </h2>
               <p className="text-sm text-foreground-muted">{formData.email}</p>
-              
+
               <div className="mt-4 p-3 bg-gradient-to-r from-primary-500 to-primary-600 rounded-xl text-white">
                 <p className="text-sm opacity-80">Membership</p>
                 <p className="font-semibold text-lg">{formData.membershipTier} Member</p>
@@ -280,12 +366,60 @@ export default function ProfilePage() {
                     <p className="text-sm text-foreground-muted mt-1 mb-4">
                       Update your password to keep your account secure
                     </p>
+
+                    {passwordSuccess && (
+                      <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-700 font-medium">
+                        Password updated successfully
+                      </div>
+                    )}
+
                     <div className="space-y-3">
-                      <Input type="password" placeholder="Current password" />
-                      <Input type="password" placeholder="New password" />
-                      <Input type="password" placeholder="Confirm new password" />
+                      <div>
+                        <Input
+                          type="password"
+                          placeholder="Current password"
+                          value={passwordData.currentPassword}
+                          onChange={(e) => {
+                            setPasswordData({ ...passwordData, currentPassword: e.target.value });
+                            setPasswordErrors((prev) => ({ ...prev, currentPassword: "" }));
+                          }}
+                        />
+                        {passwordErrors.currentPassword && (
+                          <p className="text-xs text-red-500 mt-1">{passwordErrors.currentPassword}</p>
+                        )}
+                      </div>
+                      <div>
+                        <Input
+                          type="password"
+                          placeholder="New password"
+                          value={passwordData.newPassword}
+                          onChange={(e) => {
+                            setPasswordData({ ...passwordData, newPassword: e.target.value });
+                            setPasswordErrors((prev) => ({ ...prev, newPassword: "" }));
+                          }}
+                        />
+                        {passwordErrors.newPassword && (
+                          <p className="text-xs text-red-500 mt-1">{passwordErrors.newPassword}</p>
+                        )}
+                      </div>
+                      <div>
+                        <Input
+                          type="password"
+                          placeholder="Confirm new password"
+                          value={passwordData.confirmPassword}
+                          onChange={(e) => {
+                            setPasswordData({ ...passwordData, confirmPassword: e.target.value });
+                            setPasswordErrors((prev) => ({ ...prev, confirmPassword: "" }));
+                          }}
+                        />
+                        {passwordErrors.confirmPassword && (
+                          <p className="text-xs text-red-500 mt-1">{passwordErrors.confirmPassword}</p>
+                        )}
+                      </div>
                     </div>
-                    <Button className="mt-4">Update Password</Button>
+                    <Button className="mt-4" onClick={handleUpdatePassword}>
+                      Update Password
+                    </Button>
                   </div>
 
                   <Separator />
@@ -295,7 +429,11 @@ export default function ProfilePage() {
                     <p className="text-sm text-foreground-muted mt-1 mb-4">
                       Permanently delete your account and all associated data
                     </p>
-                    <Button variant="outline" className="text-red-600 border-red-200 hover:bg-red-50">
+                    <Button
+                      variant="outline"
+                      className="text-red-600 border-red-200 hover:bg-red-50"
+                      onClick={() => { setDeleteConfirmText(""); setDeleteDialogOpen(true); }}
+                    >
                       Delete Account
                     </Button>
                   </div>
@@ -305,6 +443,41 @@ export default function ProfilePage() {
           </Tabs>
         </div>
       </div>
+
+      {/* Delete Account Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="text-red-600">Delete Account</DialogTitle>
+            <DialogDescription>
+              This action is permanent and cannot be undone. All your data, bookings, membership, and points will be permanently deleted.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <label className="text-sm font-medium text-gray-700">
+              Type <span className="font-bold">DELETE</span> to confirm
+            </label>
+            <Input
+              value={deleteConfirmText}
+              onChange={(e) => setDeleteConfirmText(e.target.value)}
+              placeholder="Type DELETE here"
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="outline"
+              className="text-red-600 border-red-200 hover:bg-red-50"
+              disabled={deleteConfirmText !== "DELETE"}
+              onClick={handleDeleteAccount}
+            >
+              Delete My Account
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

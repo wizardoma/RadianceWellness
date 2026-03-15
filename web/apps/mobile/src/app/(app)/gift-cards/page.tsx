@@ -2,22 +2,33 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { 
+import {
   ArrowLeft,
-  Gift, 
-  Send, 
+  Gift,
+  Send,
   CreditCard,
   Check,
   ChevronRight,
   Sparkles,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Button, Badge, Input, Separator } from "@radiance/ui";
+import {
+  Button,
+  Badge,
+  Input,
+  Separator,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+} from "@radiance/ui";
 import { formatCurrency } from "@radiance/utils";
 
 const giftCardAmounts = [5000, 10000, 15000, 25000, 50000, 100000];
 
-const myGiftCards = [
+const initialGiftCards = [
   {
     id: "gc-1",
     code: "RW-GIFT-A3F2",
@@ -47,11 +58,45 @@ export default function GiftCardsPage() {
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [purchaseComplete, setPurchaseComplete] = useState(false);
 
+  // Gift card state
+  const [myGiftCards, setMyGiftCards] = useState(initialGiftCards);
+
+  // "Use Now" dialog state
+  const [useNowCard, setUseNowCard] = useState<typeof initialGiftCards[0] | null>(null);
+
+  // Redeem code state
+  const [redeemCode, setRedeemCode] = useState("");
+  const [isValidating, setIsValidating] = useState(false);
+  const [redeemSuccess, setRedeemSuccess] = useState(false);
+
   const handlePurchase = async () => {
     setIsPurchasing(true);
     await new Promise(r => setTimeout(r, 1500));
     setPurchaseComplete(true);
     setIsPurchasing(false);
+  };
+
+  const handleUseNow = (card: typeof initialGiftCards[0]) => {
+    setUseNowCard(card);
+  };
+
+  const handleRedeemCode = async () => {
+    if (!redeemCode.trim()) return;
+    setIsValidating(true);
+    await new Promise(r => setTimeout(r, 1200));
+    setIsValidating(false);
+    // Always succeed with 15,000
+    const newCard = {
+      id: `gc-${Date.now()}`,
+      code: redeemCode.toUpperCase(),
+      balance: 15000,
+      originalAmount: 15000,
+      expiresAt: "2027-12-31",
+      from: "Redeemed",
+    };
+    setMyGiftCards(prev => [...prev, newCard]);
+    setRedeemCode("");
+    setRedeemSuccess(true);
   };
 
   const totalBalance = myGiftCards.reduce((sum, card) => sum + card.balance, 0);
@@ -66,7 +111,7 @@ export default function GiftCardsPage() {
         <p className="text-gray-500 mb-6">
           Your gift card has been sent to {recipientEmail}
         </p>
-        
+
         <div className="w-full bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl p-6 text-white mb-6">
           <Gift className="h-8 w-8 mb-2" />
           <p className="text-sm opacity-80">Gift Card Value</p>
@@ -77,8 +122,8 @@ export default function GiftCardsPage() {
         </div>
 
         <div className="w-full space-y-3">
-          <Button 
-            className="w-full" 
+          <Button
+            className="w-full"
             onClick={() => {
               setPurchaseComplete(false);
               setSelectedAmount(null);
@@ -210,8 +255,8 @@ export default function GiftCardsPage() {
           </div>
 
           {/* Purchase Button */}
-          <Button 
-            className="w-full" 
+          <Button
+            className="w-full"
             disabled={(!selectedAmount && !customAmount) || !recipientEmail || !recipientName || isPurchasing}
             onClick={handlePurchase}
           >
@@ -263,7 +308,10 @@ export default function GiftCardsPage() {
                 <Separator className="my-3" />
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-gray-500">Expires: {card.expiresAt}</span>
-                  <button className="text-primary-600 font-medium flex items-center gap-1">
+                  <button
+                    onClick={() => handleUseNow(card)}
+                    className="text-primary-600 font-medium flex items-center gap-1"
+                  >
                     Use Now <ChevronRight className="h-4 w-4" />
                   </button>
                 </div>
@@ -275,12 +323,83 @@ export default function GiftCardsPage() {
           <div className="bg-gray-50 rounded-xl p-4">
             <h3 className="font-medium mb-2">Have a gift card code?</h3>
             <div className="flex gap-2">
-              <Input placeholder="Enter code" className="flex-1" />
-              <Button>Redeem</Button>
+              <Input
+                placeholder="Enter code"
+                className="flex-1"
+                value={redeemCode}
+                onChange={(e) => setRedeemCode(e.target.value)}
+              />
+              <Button onClick={handleRedeemCode} disabled={!redeemCode.trim() || isValidating}>
+                {isValidating ? (
+                  <div className="flex items-center gap-1">
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                    <span className="sr-only">Validating</span>
+                  </div>
+                ) : (
+                  "Redeem"
+                )}
+              </Button>
             </div>
+            {isValidating && (
+              <p className="text-sm text-gray-500 mt-2">Validating...</p>
+            )}
           </div>
         </motion.div>
       )}
+
+      {/* Use Now Dialog */}
+      <Dialog open={!!useNowCard} onOpenChange={(open) => !open && setUseNowCard(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Use Gift Card</DialogTitle>
+            <DialogDescription>Apply this gift card at checkout.</DialogDescription>
+          </DialogHeader>
+          {useNowCard && (
+            <div className="space-y-4">
+              <div className="bg-primary-50 rounded-xl p-4 text-center">
+                <p className="text-sm text-gray-600">Gift card <span className="font-mono font-medium">{useNowCard.code}</span> will be applied at checkout.</p>
+                <p className="text-2xl font-bold text-primary-700 mt-2">
+                  Balance: {formatCurrency(useNowCard.balance)}
+                </p>
+              </div>
+            </div>
+          )}
+          <DialogFooter className="flex-col sm:flex-col gap-2">
+            <Button className="w-full" onClick={() => { setUseNowCard(null); router.push("/book"); }}>
+              Go to Booking
+            </Button>
+            <Button variant="outline" className="w-full" onClick={() => setUseNowCard(null)}>
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Redeem Success Dialog */}
+      <Dialog open={redeemSuccess} onOpenChange={(open) => !open && setRedeemSuccess(false)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Gift Card Redeemed!</DialogTitle>
+            <DialogDescription>Your gift card has been successfully added.</DialogDescription>
+          </DialogHeader>
+          <div className="text-center space-y-3">
+            <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto">
+              <Check className="h-8 w-8 text-green-600" />
+            </div>
+            <p className="text-lg font-bold text-gray-900">
+              {formatCurrency(15000)} added to your balance
+            </p>
+            <p className="text-sm text-gray-500">
+              Your new total balance is {formatCurrency(totalBalance)}
+            </p>
+          </div>
+          <DialogFooter>
+            <Button className="w-full" onClick={() => setRedeemSuccess(false)}>
+              Done
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

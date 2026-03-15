@@ -1,11 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { ArrowRight, Play } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowRight, Play, X } from "lucide-react";
 import { Button } from "@radiance/ui";
 
 export function HeroSection() {
+  const [showVideo, setShowVideo] = useState(false);
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background Image */}
@@ -59,10 +62,11 @@ export function HeroSection() {
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
-              <Button 
-                variant="outline" 
-                size="xl" 
+              <Button
+                variant="outline"
+                size="xl"
                 className="min-w-[200px] border-white/30 text-white hover:bg-white/10"
+                onClick={() => setShowVideo(true)}
               >
                 <Play className="mr-2 h-5 w-5" />
                 Watch Video
@@ -93,6 +97,50 @@ export function HeroSection() {
           </motion.div>
         </div>
       </div>
+
+      {/* Video Overlay */}
+      <AnimatePresence>
+        {showVideo && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
+            onClick={() => setShowVideo(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="relative w-full max-w-3xl mx-4"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Close button */}
+              <button
+                onClick={() => setShowVideo(false)}
+                className="absolute -top-12 right-0 text-white/80 hover:text-white transition-colors"
+                aria-label="Close video"
+              >
+                <X className="h-8 w-8" />
+              </button>
+
+              {/* 16:9 aspect ratio container */}
+              <div className="relative aspect-video bg-primary-900/90 rounded-2xl border border-white/10 flex flex-col items-center justify-center">
+                <div className="w-20 h-20 rounded-full bg-white/10 flex items-center justify-center mb-6">
+                  <Play className="h-10 w-10 text-white fill-white" />
+                </div>
+                <p className="text-white text-2xl font-display font-semibold">
+                  Video Coming Soon
+                </p>
+                <p className="text-white/60 text-sm mt-2">
+                  Our wellness experience video is in production
+                </p>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Scroll Indicator */}
       <motion.div

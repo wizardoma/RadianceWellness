@@ -6,6 +6,8 @@ import {
   LayoutDashboard,
   Calendar,
   CalendarPlus,
+  ShoppingBag,
+  Building2,
   User,
   CreditCard,
   Gift,
@@ -13,6 +15,7 @@ import {
   Menu,
   X,
   ChevronRight,
+  Package,
 } from "lucide-react";
 import { cn } from "@radiance/utils";
 import { Button } from "@radiance/ui";
@@ -22,6 +25,9 @@ const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "My Bookings", href: "/bookings", icon: Calendar },
   { name: "Book a Service", href: "/book", icon: CalendarPlus },
+  { name: "Shop", href: "/shop", icon: ShoppingBag },
+  { name: "My Orders", href: "/orders", icon: Package },
+  { name: "Accommodations", href: "/accommodations", icon: Building2 },
   { name: "Memberships", href: "/memberships", icon: CreditCard },
   { name: "Gift Cards", href: "/gift-cards", icon: Gift },
   { name: "My Profile", href: "/profile", icon: User },

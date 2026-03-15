@@ -160,8 +160,10 @@ export default function DashboardPage() {
                           {booking.status}
                         </Badge>
                         <div className="mt-2">
-                          <Button variant="ghost" size="sm">
-                            View Details
+                          <Button variant="ghost" size="sm" asChild>
+                            <Link href="/bookings">
+                              View Details
+                            </Link>
                           </Button>
                         </div>
                       </div>
@@ -254,8 +256,10 @@ export default function DashboardPage() {
                 Enjoy 15% off all services and priority booking
               </p>
             </div>
-            <Button variant="secondary" className="bg-white text-primary-600 hover:bg-primary-50">
-              View Benefits
+            <Button variant="secondary" className="bg-white text-primary-600 hover:bg-primary-50" asChild>
+              <Link href="/memberships">
+                View Benefits
+              </Link>
             </Button>
           </div>
         </CardContent>

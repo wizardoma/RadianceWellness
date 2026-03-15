@@ -18,6 +18,15 @@ import {
   Shield,
   Clock,
   CheckSquare,
+  Building2,
+  Tag,
+  Crown,
+  Wallet,
+  ShoppingBag,
+  Package,
+  Megaphone,
+  CalendarOff,
+  UserCircle,
 } from "lucide-react";
 import { cn } from "@radiance/utils";
 import { Button, Badge } from "@radiance/ui";
@@ -31,8 +40,15 @@ const adminNavigation = [
   { name: "Bookings", href: "/bookings", icon: Calendar, badge: "12" },
   { name: "Customers", href: "/customers", icon: Users },
   { name: "Services", href: "/services", icon: Sparkles },
+  { name: "Accommodations", href: "/accommodations", icon: Building2 },
   { name: "Staff", href: "/staff", icon: UserCog },
+  { name: "Pricing", href: "/pricing", icon: Tag },
+  { name: "Memberships", href: "/memberships", icon: Crown },
+  { name: "Payments", href: "/payments", icon: Wallet },
+  { name: "Products", href: "/products", icon: ShoppingBag },
+  { name: "Inventory", href: "/inventory", icon: Package, badge: "3" },
   { name: "Reports", href: "/reports", icon: BarChart3 },
+  { name: "Marketing", href: "/marketing", icon: Megaphone },
   { name: "Settings", href: "/settings", icon: Settings },
 ];
 
@@ -42,6 +58,7 @@ const staffNavigation = [
   { name: "My Schedule", href: "/bookings", icon: Calendar, badge: "5" },
   { name: "Check-in", href: "/check-in", icon: CheckSquare },
   { name: "Customers", href: "/customers", icon: Users },
+  { name: "My Profile", href: "/my-profile", icon: UserCircle },
 ];
 
 // Mock user data

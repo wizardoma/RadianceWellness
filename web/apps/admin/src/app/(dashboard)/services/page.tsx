@@ -2,19 +2,101 @@
 
 import { useState } from "react";
 import { Search, Plus, Edit, Trash2, Clock, Star } from "lucide-react";
-import { Button, Card, CardContent, Input, Badge } from "@radiance/ui";
-import { services, serviceCategories } from "@radiance/mock-data";
+import {
+  Button,
+  Card,
+  CardContent,
+  Input,
+  Badge,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  Label,
+  Switch,
+  Textarea,
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@radiance/ui";
+import { services as initialServices, serviceCategories } from "@radiance/mock-data";
 import { formatCurrency } from "@radiance/utils";
+
+type ServiceItem = typeof initialServices[number];
+
+const emptyServiceForm = {
+  name: "",
+  category: "",
+  shortDescription: "",
+  duration: "",
+  price: "",
+  isActive: true,
+  requiresStaff: true,
+};
 
 export default function ServicesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [servicesList, setServicesList] = useState(initialServices);
 
-  const filteredServices = services.filter((service) => {
+  // Add/Edit Service dialog
+  const [serviceDialogOpen, setServiceDialogOpen] = useState(false);
+  const [editingService, setEditingService] = useState<ServiceItem | null>(null);
+  const [serviceForm, setServiceForm] = useState(emptyServiceForm);
+
+  // Delete confirmation dialog
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deletingService, setDeletingService] = useState<ServiceItem | null>(null);
+
+  const filteredServices = servicesList.filter((service) => {
     const matchesSearch = service.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = !selectedCategory || service.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
+
+  const handleOpenAddDialog = () => {
+    setEditingService(null);
+    setServiceForm(emptyServiceForm);
+    setServiceDialogOpen(true);
+  };
+
+  const handleOpenEditDialog = (service: ServiceItem) => {
+    setEditingService(service);
+    setServiceForm({
+      name: service.name,
+      category: service.category,
+      shortDescription: service.shortDescription,
+      duration: service.duration[0]?.toString() ?? "",
+      price: Object.values(service.price)[0]?.toString() ?? "",
+      isActive: true,
+      requiresStaff: true,
+    });
+    setServiceDialogOpen(true);
+  };
+
+  const handleSaveService = () => {
+    // In a real app this would call an API
+    setServiceDialogOpen(false);
+    setEditingService(null);
+    setServiceForm(emptyServiceForm);
+  };
+
+  const handleOpenDeleteDialog = (service: ServiceItem) => {
+    setDeletingService(service);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (deletingService) {
+      setServicesList((prev) => prev.filter((s) => s.id !== deletingService.id));
+    }
+    setDeleteDialogOpen(false);
+    setDeletingService(null);
+  };
 
   return (
     <div className="space-y-6">
@@ -28,7 +110,7 @@ export default function ServicesPage() {
             Manage your service catalog
           </p>
         </div>
-        <Button>
+        <Button onClick={handleOpenAddDialog}>
           <Plus className="mr-2 h-4 w-4" />
           Add Service
         </Button>
@@ -82,7 +164,7 @@ export default function ServicesPage() {
                   <Badge className="bg-accent-100 text-accent-700">Popular</Badge>
                 )}
               </div>
-              
+
               <p className="text-sm text-gray-600 mb-4 line-clamp-2">
                 {service.shortDescription}
               </p>
@@ -108,10 +190,15 @@ export default function ServicesPage() {
                   )}
                 </div>
                 <div className="flex gap-1">
-                  <Button variant="ghost" size="icon">
+                  <Button variant="ghost" size="icon" onClick={() => handleOpenEditDialog(service)}>
                     <Edit className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-600">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-red-500 hover:text-red-600"
+                    onClick={() => handleOpenDeleteDialog(service)}
+                  >
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
@@ -120,6 +207,132 @@ export default function ServicesPage() {
           </Card>
         ))}
       </div>
+
+      {/* Add/Edit Service Dialog */}
+      <Dialog open={serviceDialogOpen} onOpenChange={setServiceDialogOpen}>
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{editingService ? "Edit Service" : "Add New Service"}</DialogTitle>
+            <DialogDescription>
+              {editingService
+                ? "Update the service details below."
+                : "Fill in the details for the new service."}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="serviceName">Service Name</Label>
+              <Input
+                id="serviceName"
+                value={serviceForm.name}
+                onChange={(e) => setServiceForm({ ...serviceForm, name: e.target.value })}
+                placeholder="e.g. Swedish Massage"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="serviceCategory">Category</Label>
+              <Select
+                value={serviceForm.category}
+                onValueChange={(value) => setServiceForm({ ...serviceForm, category: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {serviceCategories.map((cat) => (
+                    <SelectItem key={cat.id} value={cat.id}>
+                      {cat.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="serviceDesc">Short Description</Label>
+              <Textarea
+                id="serviceDesc"
+                value={serviceForm.shortDescription}
+                onChange={(e) => setServiceForm({ ...serviceForm, shortDescription: e.target.value })}
+                placeholder="Brief description of the service..."
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="serviceDuration">Duration (minutes)</Label>
+                <Input
+                  id="serviceDuration"
+                  type="number"
+                  value={serviceForm.duration}
+                  onChange={(e) => setServiceForm({ ...serviceForm, duration: e.target.value })}
+                  placeholder="60"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="servicePrice">Price</Label>
+                <Input
+                  id="servicePrice"
+                  type="number"
+                  value={serviceForm.price}
+                  onChange={(e) => setServiceForm({ ...serviceForm, price: e.target.value })}
+                  placeholder="25000"
+                />
+              </div>
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label>Status</Label>
+                <p className="text-sm text-gray-500">{serviceForm.isActive ? "Active" : "Inactive"}</p>
+              </div>
+              <Switch
+                checked={serviceForm.isActive}
+                onCheckedChange={(checked) => setServiceForm({ ...serviceForm, isActive: checked })}
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label>Requires Staff</Label>
+                <p className="text-sm text-gray-500">
+                  {serviceForm.requiresStaff ? "Staff member required" : "Self-service"}
+                </p>
+              </div>
+              <Switch
+                checked={serviceForm.requiresStaff}
+                onCheckedChange={(checked) => setServiceForm({ ...serviceForm, requiresStaff: checked })}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setServiceDialogOpen(false)}>Cancel</Button>
+            <Button onClick={handleSaveService}>
+              {editingService ? "Update Service" : "Save Service"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Service</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete <strong>{deletingService?.name}</strong>?
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-sm text-gray-500">
+              This action cannot be undone. The service will be permanently removed from your catalog.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
+            <Button variant="destructive" onClick={handleConfirmDelete}>
+              <Trash2 className="mr-2 h-4 w-4" />
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

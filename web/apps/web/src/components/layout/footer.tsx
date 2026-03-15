@@ -1,12 +1,15 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
-import { 
-  Facebook, 
-  Instagram, 
-  Twitter, 
-  MapPin, 
-  Phone, 
-  Mail, 
-  Clock 
+import {
+  Facebook,
+  Instagram,
+  Twitter,
+  MapPin,
+  Phone,
+  Mail,
+  Clock,
 } from "lucide-react";
 import { Button, Input } from "@radiance/ui";
 
@@ -20,7 +23,7 @@ const footerLinks = {
   company: [
     { label: "About Us", href: "/about" },
     { label: "Our Team", href: "/about#team" },
-    { label: "Careers", href: "/careers" },
+    { label: "Gallery", href: "/gallery" },
     { label: "Contact", href: "/contact" },
   ],
   support: [
@@ -38,6 +41,17 @@ const socialLinks = [
 ];
 
 export function Footer() {
+  const [subscribed, setSubscribed] = useState(false);
+  const [email, setEmail] = useState("");
+
+  const handleSubscribe = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+    setSubscribed(true);
+    setEmail("");
+    setTimeout(() => setSubscribed(false), 2000);
+  };
+
   return (
     <footer className="bg-primary-900 text-white">
       {/* Main Footer */}
@@ -54,30 +68,30 @@ export function Footer() {
               </span>
             </Link>
             <p className="text-primary-200 text-sm leading-relaxed mb-6 max-w-md">
-              Your sanctuary of wellness and relaxation. Experience premium spa, 
-              fitness, and accommodation services designed to rejuvenate your 
+              Your sanctuary of wellness and relaxation. Experience premium spa,
+              fitness, and accommodation services designed to rejuvenate your
               mind, body, and soul.
             </p>
-            
+
             {/* Contact Info */}
             <div className="space-y-3">
-              <a 
-                href="https://maps.google.com" 
-                target="_blank" 
+              <a
+                href="https://maps.google.com"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-start text-sm text-primary-200 hover:text-white transition-colors"
               >
                 <MapPin className="h-5 w-5 mr-3 mt-0.5 flex-shrink-0" />
                 <span>1 Setif Close, Adzope Crescent, Off Kumasi Crescent, Wuse 2, Abuja</span>
               </a>
-              <a 
+              <a
                 href="tel:+2348001234567"
                 className="flex items-center text-sm text-primary-200 hover:text-white transition-colors"
               >
                 <Phone className="h-5 w-5 mr-3 flex-shrink-0" />
                 <span>+234 800 123 4567</span>
               </a>
-              <a 
+              <a
                 href="mailto:hello@radiancewellness.com"
                 className="flex items-center text-sm text-primary-200 hover:text-white transition-colors"
               >
@@ -100,7 +114,7 @@ export function Footer() {
             <ul className="space-y-3">
               {footerLinks.services.map((link) => (
                 <li key={link.href}>
-                  <Link 
+                  <Link
                     href={link.href}
                     className="text-sm text-primary-200 hover:text-white transition-colors"
                   >
@@ -117,7 +131,21 @@ export function Footer() {
             <ul className="space-y-3">
               {footerLinks.company.map((link) => (
                 <li key={link.href}>
-                  <Link 
+                  <Link
+                    href={link.href}
+                    className="text-sm text-primary-200 hover:text-white transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+
+            <h3 className="font-display text-lg font-semibold mb-4 mt-8">Support</h3>
+            <ul className="space-y-3">
+              {footerLinks.support.map((link) => (
+                <li key={link.href}>
+                  <Link
                     href={link.href}
                     className="text-sm text-primary-200 hover:text-white transition-colors"
                   >
@@ -134,17 +162,23 @@ export function Footer() {
             <p className="text-sm text-primary-200 mb-4">
               Subscribe for exclusive offers and wellness tips.
             </p>
-            <form className="space-y-3">
+            <form onSubmit={handleSubscribe} className="space-y-3">
               <Input
                 type="email"
                 placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
                 className="bg-primary-800 border-primary-700 text-white placeholder:text-primary-400 focus-visible:ring-accent-400"
               />
-              <Button className="w-full bg-accent-400 hover:bg-accent-500 text-accent-950">
-                Subscribe
+              <Button
+                type="submit"
+                className="w-full bg-accent-400 hover:bg-accent-500 text-accent-950"
+              >
+                {subscribed ? "Subscribed!" : "Subscribe"}
               </Button>
             </form>
-            
+
             {/* Social Links */}
             <div className="flex space-x-3 mt-6">
               {socialLinks.map((social) => (
@@ -169,7 +203,7 @@ export function Footer() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
             <p className="text-sm text-primary-300">
-              © {new Date().getFullYear()} Radiance Wellness Center. All rights reserved.
+              &copy; {new Date().getFullYear()} Radiance Wellness Center. All rights reserved.
             </p>
             <div className="flex space-x-6">
               {footerLinks.support.slice(1).map((link) => (

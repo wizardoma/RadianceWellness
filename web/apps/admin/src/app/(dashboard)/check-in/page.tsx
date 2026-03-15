@@ -282,6 +282,12 @@ function CheckInPageContent() {
   const [walkInForm, setWalkInForm] = useState<WalkInForm>(initialWalkInForm);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isProcessing, setIsProcessing] = useState(false);
+  const [userRole, setUserRole] = useState<"admin" | "staff">("admin");
+
+  useEffect(() => {
+    const role = localStorage.getItem("userRole") as "admin" | "staff";
+    if (role) setUserRole(role);
+  }, []);
 
   // Check if opened with walkin param
   useEffect(() => {
@@ -304,7 +310,9 @@ function CheckInPageContent() {
     });
   };
 
-  const filteredBookings = bookings.filter((booking) => {
+  const displayBookings = userRole === "staff" ? bookings.filter(b => b.therapist === "Chidi Eze") : bookings;
+
+  const filteredBookings = displayBookings.filter((booking) => {
     if (!searchQuery) return true;
     return (
       booking.customer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -534,10 +542,12 @@ function CheckInPageContent() {
             <RefreshCw className="h-4 w-4 mr-2" />
             Refresh
           </Button>
-          <Button onClick={openWalkInDialog}>
-            <UserPlus className="h-4 w-4 mr-2" />
-            Walk-In Customer
-          </Button>
+          {userRole === "admin" && (
+            <Button onClick={openWalkInDialog}>
+              <UserPlus className="h-4 w-4 mr-2" />
+              Walk-In Customer
+            </Button>
+          )}
         </div>
       </div>
 

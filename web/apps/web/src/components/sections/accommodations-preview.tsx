@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, Star, Users, Bed, Wifi, Coffee, Dumbbell } from "lucide-react";
-import { Button, Badge } from "@radiance/ui";
+import { Badge } from "@radiance/ui";
 import { accommodations } from "@radiance/mock-data";
 import { formatCurrency } from "@radiance/utils";
 
@@ -55,7 +55,7 @@ export function AccommodationsPreview() {
                 transition={{ delay: index * 0.2 }}
               >
                 <Link
-                  href={`/accommodations/${accommodation.slug}`}
+                  href={`/accommodations#${accommodation.slug}`}
                   className="group block bg-white rounded-3xl overflow-hidden text-gray-900"
                 >
                   {/* Image */}
@@ -117,10 +117,10 @@ export function AccommodationsPreview() {
                           <span className="text-gray-500 ml-1">/night</span>
                         </div>
                       </div>
-                      <Button>
+                      <span className="inline-flex items-center justify-center rounded-md bg-primary-500 px-4 py-2 text-sm font-medium text-white transition-colors group-hover:bg-primary-600">
                         View Details
                         <ArrowRight className="ml-2 h-4 w-4" />
-                      </Button>
+                      </span>
                     </div>
                   </div>
                 </Link>

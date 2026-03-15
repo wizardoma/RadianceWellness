@@ -19,6 +19,9 @@ const navItems = [
       description: cat.description,
     })),
   },
+  { label: "Accommodations", href: "/accommodations" },
+  { label: "Pricing", href: "/pricing" },
+  { label: "Gallery", href: "/gallery" },
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
 ];

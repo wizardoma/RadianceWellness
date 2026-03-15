@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Sparkles, Calendar, User } from "lucide-react";
+import { Home, CalendarPlus, ShoppingBag, Calendar, User } from "lucide-react";
 import { cn } from "@radiance/utils";
 
 const navItems = [
   { icon: Home, label: "Home", href: "/home" },
-  { icon: Sparkles, label: "Services", href: "/services" },
+  { icon: CalendarPlus, label: "Book", href: "/book" },
+  { icon: ShoppingBag, label: "Shop", href: "/shop" },
   { icon: Calendar, label: "Bookings", href: "/bookings" },
   { icon: User, label: "Profile", href: "/profile" },
 ];

@@ -2,15 +2,16 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Star, Clock, Check, ChevronRight, Users } from "lucide-react";
 import { Button, Badge, Card, CardContent } from "@radiance/ui";
-import { 
-  services, 
-  getServiceBySlug, 
-  getCategoryBySlug, 
+import {
+  services,
+  getServiceBySlug,
+  getCategoryBySlug,
   getAddOnsByIds,
   getStaffByService,
-  getPopularServices 
+  getPopularServices
 } from "@radiance/mock-data";
 import { formatCurrency, formatDuration, slugToTitle } from "@radiance/utils";
+import { ServicePricing } from "@/components/service-pricing";
 
 const serviceImages: Record<string, string[]> = {
   "swedish-massage": [
@@ -226,106 +227,18 @@ export default function ServiceDetailPage({
           {/* Right Column - Booking Card */}
           <div className="lg:col-span-1">
             <div className="sticky top-24">
-              <Card className="shadow-soft-lg">
-                <CardContent className="p-6">
-                  <div className="mb-6">
-                    <span className="text-sm text-gray-500">Starting from</span>
-                    <div className="flex items-baseline">
-                      <span className="font-display text-3xl font-bold text-primary-600">
-                        {formatCurrency(minPrice)}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Duration Options */}
-                  <div className="mb-6">
-                    <label className="block text-sm font-medium text-gray-700 mb-3">
-                      Select Duration
-                    </label>
-                    <div className="space-y-2">
-                      {service.duration.map((duration) => (
-                        <label
-                          key={duration}
-                          className="flex items-center justify-between p-4 border border-border rounded-xl cursor-pointer hover:border-primary-300 transition-colors"
-                        >
-                          <div className="flex items-center">
-                            <input
-                              type="radio"
-                              name="duration"
-                              value={duration}
-                              defaultChecked={duration === service.duration[0]}
-                              className="h-4 w-4 text-primary-600 focus:ring-primary-500"
-                            />
-                            <span className="ml-3 text-gray-900">{formatDuration(duration)}</span>
-                          </div>
-                          <span className="font-semibold text-gray-900">
-                            {formatCurrency(service.price[duration])}
-                          </span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Add-ons */}
-                  {addOns.length > 0 && (
-                    <div className="mb-6">
-                      <label className="block text-sm font-medium text-gray-700 mb-3">
-                        Enhance Your Experience
-                      </label>
-                      <div className="space-y-2">
-                        {addOns.map((addon) => (
-                          <label
-                            key={addon.id}
-                            className="flex items-center justify-between p-3 border border-border rounded-xl cursor-pointer hover:border-primary-300 transition-colors"
-                          >
-                            <div className="flex items-center">
-                              <input
-                                type="checkbox"
-                                className="h-4 w-4 text-primary-600 focus:ring-primary-500 rounded"
-                              />
-                              <div className="ml-3">
-                                <span className="text-sm text-gray-900">{addon.name}</span>
-                                {addon.duration && (
-                                  <span className="text-xs text-gray-500 ml-2">
-                                    +{addon.duration} min
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                            <span className="text-sm font-medium text-gray-900">
-                              +{formatCurrency(addon.price)}
-                            </span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  <Button size="lg" className="w-full" asChild>
-                    <Link href={`/book?service=${service.id}`}>
-                      Book Now
-                    </Link>
-                  </Button>
-
-                  <p className="text-xs text-gray-500 text-center mt-4">
-                    Free cancellation up to 24 hours before
-                  </p>
-                </CardContent>
-              </Card>
-
-              {/* Help Card */}
-              <Card className="mt-6">
-                <CardContent className="p-6 text-center">
-                  <Users className="h-8 w-8 text-primary-500 mx-auto mb-3" />
-                  <h3 className="font-semibold text-gray-900 mb-2">Need Help?</h3>
-                  <p className="text-sm text-gray-500 mb-4">
-                    Our team is here to help you choose the right treatment.
-                  </p>
-                  <Button variant="outline" size="sm" asChild>
-                    <a href="https://wa.me/2348001234567">Chat with us</a>
-                  </Button>
-                </CardContent>
-              </Card>
+              <ServicePricing
+                serviceId={service.id}
+                durations={service.duration}
+                prices={service.price}
+                addOns={addOns.map((a) => ({
+                  id: a.id,
+                  name: a.name,
+                  description: a.description,
+                  price: a.price,
+                  duration: a.duration,
+                }))}
+              />
             </div>
           </div>
         </div>
