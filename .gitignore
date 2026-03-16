@@ -42,5 +42,3 @@ coverage
 *.log
 docs/
 
-# Backend (private repo only)
-backend/
