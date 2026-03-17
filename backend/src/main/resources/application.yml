@@ -1,0 +1,45 @@
+server:
+  port: ${SERVER_PORT:8080}
+
+spring:
+  profiles:
+    active: dev
+  application:
+    name: radiance-wellness
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+  datasource:
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+      idle-timeout: 300000
+      pool-name: "RadianceWellnessHikariPool"
+jwt:
+  secret: ${JWT_SECRET:radiance-wellness-spa-jwt-secret-key-2026-development-only}
+  access-token-expiration: ${JWT_ACCESS_EXPIRATION:900000}
+  refresh-token-expiration: ${JWT_REFRESH_EXPIRATION:604800000}
+
+paystack:
+  secret-key: ${PAYSTACK_SECRET_KEY:sk_test_placeholder}
+  public-key: ${PAYSTACK_PUBLIC_KEY:pk_test_placeholder}
+  base-url: https://api.paystack.co
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
+  packages-to-scan: com.zaidom.radiancewellness
+  paths-to-match: /**
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

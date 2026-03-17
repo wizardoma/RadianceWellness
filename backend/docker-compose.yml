@@ -1,0 +1,21 @@
+services:
+  radiance-db:
+    image: postgres:16-alpine
+    container_name: radiance-wellness-db
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=radiance_wellness
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - radiance-db-data:/var/lib/postgresql/data
+
+  radiance-redis:
+    image: redis:7-alpine
+    container_name: radiance-wellness-redis
+    ports:
+      - "6379:6379"
+
+volumes:
+  radiance-db-data:
