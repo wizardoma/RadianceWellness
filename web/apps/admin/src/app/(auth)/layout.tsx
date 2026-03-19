@@ -1,11 +1,24 @@
+"use client";
+
 import Link from "next/link";
 import { LogoIcon } from "@radiance/ui";
+import { useRedirectIfAuthenticated } from "@/application/hooks/useAuthGuard";
 
 export default function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const ready = useRedirectIfAuthenticated();
+
+  if (!ready) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-2 border-white border-t-transparent" />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -21,11 +34,11 @@ export default function AuthLayout({
           </h1>
           <p className="text-primary-200 text-sm mt-1">Staff & Admin Portal</p>
         </div>
-        
+
         {children}
-        
+
         <p className="text-center text-primary-300 text-sm mt-8">
-          © {new Date().getFullYear()} Radiance Wellness Spa
+          &copy; {new Date().getFullYear()} Radiance Wellness Spa
         </p>
       </div>
     </div>

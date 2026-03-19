@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useUserStore } from "@/application/user/user.store";
 import {
   Users,
   Search,
@@ -85,12 +86,8 @@ const emptyCustomerForm = {
 export default function CustomersPage() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
-  const [userRole, setUserRole] = useState<"admin" | "staff">("admin");
-
-  useEffect(() => {
-    const role = localStorage.getItem("userRole") as "admin" | "staff";
-    if (role) setUserRole(role);
-  }, []);
+  const profile = useUserStore((s) => s.profile);
+  const userRole: "admin" | "staff" = profile?.role?.toLowerCase() === "staff" ? "staff" : "admin";
 
   // Add Customer dialog
   const [addDialogOpen, setAddDialogOpen] = useState(false);

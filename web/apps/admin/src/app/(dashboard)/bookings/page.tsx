@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useUserStore } from "@/application/user/user.store";
 import {
   Calendar,
   Clock,
@@ -168,7 +169,8 @@ export default function BookingsPage() {
   const [bookings, setBookings] = useState<Booking[]>(initialBookings);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDate, setSelectedDate] = useState("2026-02-04");
-  const [userRole, setUserRole] = useState<"admin" | "staff">("admin");
+  const profile = useUserStore((s) => s.profile);
+  const userRole: "admin" | "staff" = profile?.role?.toLowerCase() === "staff" ? "staff" : "admin";
 
   // New Booking Dialog
   const [newBookingOpen, setNewBookingOpen] = useState(false);
@@ -213,10 +215,6 @@ export default function BookingsPage() {
   const [notesBooking, setNotesBooking] = useState<Booking | null>(null);
   const [notesForm, setNotesForm] = useState({ treatmentNotes: "", customerFeedback: "", followUpNeeded: false });
 
-  useEffect(() => {
-    const role = localStorage.getItem("userRole") as "admin" | "staff";
-    if (role) setUserRole(role);
-  }, []);
 
   const handleCheckIn = (bookingId: string) => {
     router.push("/check-in");

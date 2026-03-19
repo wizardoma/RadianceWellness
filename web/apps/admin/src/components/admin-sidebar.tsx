@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -25,11 +25,13 @@ import {
   ShoppingBag,
   Package,
   Megaphone,
-  CalendarOff,
   UserCircle,
 } from "lucide-react";
 import { cn } from "@radiance/utils";
 import { Button, Badge, LogoIcon } from "@radiance/ui";
+import { useAuthStore } from "@/application/auth/auth.store";
+import { useUserStore } from "@/application/user/user.store";
+import { AuthApiClient } from "@/infrastructure/api/auth.client";
 
 type UserRole = "admin" | "staff";
 
@@ -61,41 +63,43 @@ const staffNavigation = [
   { name: "My Profile", href: "/my-profile", icon: UserCircle },
 ];
 
-// Mock user data
-const users = {
-  admin: {
-    name: "Dr. Amara Okonkwo",
-    email: "amara@radiancewellness.com",
-    role: "Administrator",
-    avatar: null,
-  },
-  staff: {
-    name: "Chidi Eze",
-    email: "chidi@radiancewellness.com",
-    role: "Senior Therapist",
-    avatar: null,
-  },
+const roleDisplayNames: Record<string, string> = {
+  SUPER_ADMIN: "Administrator",
+  ADMIN: "Admin",
+  MANAGER: "Manager",
+  RECEPTIONIST: "Receptionist",
+  ACCOUNTANT: "Accountant",
+  MARKETING: "Marketing",
 };
 
 export function AdminSidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const [userRole, setUserRole] = useState<UserRole>("admin");
 
-  useEffect(() => {
-    // Get role from localStorage (set during login)
-    const role = localStorage.getItem("userRole") as UserRole;
-    if (role) {
-      setUserRole(role);
-    }
-  }, []);
+  const clearAuth = useAuthStore((s) => s.clearAuth);
+  const profile = useUserStore((s) => s.profile);
+  const clearProfile = useUserStore((s) => s.clearProfile);
+
+  const userRole: UserRole =
+    profile?.role?.toLowerCase() === "staff" || profile?.role?.toLowerCase() === "receptionist"
+      ? "staff"
+      : "admin";
 
   const navigation = userRole === "admin" ? adminNavigation : staffNavigation;
-  const user = users[userRole];
 
-  const handleLogout = () => {
-    localStorage.removeItem("userRole");
+  const displayName = profile
+    ? `${profile.firstName} ${profile.lastName}`.trim()
+    : "User";
+  const displayRole = profile?.role
+    ? roleDisplayNames[profile.role] || profile.role
+    : "Administrator";
+
+  const handleLogout = async () => {
+    // Fire-and-forget the API call
+    AuthApiClient.logout().catch(() => {});
+    clearAuth();
+    clearProfile();
     router.push("/login");
   };
 
@@ -115,7 +119,7 @@ export function AdminSidebar() {
 
       {/* Mobile overlay */}
       {isMobileOpen && (
-        <div 
+        <div
           className="lg:hidden fixed inset-0 bg-black/50 z-40"
           onClick={() => setIsMobileOpen(false)}
         />
@@ -157,8 +161,8 @@ export function AdminSidebar() {
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-white truncate">{user.name}</p>
-                <p className="text-xs text-primary-300 truncate">{user.role}</p>
+                <p className="text-sm font-medium text-white truncate">{displayName}</p>
+                <p className="text-xs text-primary-300 truncate">{displayRole}</p>
               </div>
             </div>
           </div>
@@ -166,7 +170,7 @@ export function AdminSidebar() {
           {/* Navigation */}
           <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
             {navigation.map((item) => {
-              const isActive = pathname === item.href || 
+              const isActive = pathname === item.href ||
                 (item.href !== "/dashboard" && pathname.startsWith(item.href));
               return (
                 <Link
@@ -204,7 +208,7 @@ export function AdminSidebar() {
                     <p className="text-xs text-primary-300">Today</p>
                   </div>
                   <div>
-                    <p className="text-lg font-bold text-accent-400">₦485K</p>
+                    <p className="text-lg font-bold text-accent-400">&#8358;485K</p>
                     <p className="text-xs text-primary-300">Revenue</p>
                   </div>
                 </div>

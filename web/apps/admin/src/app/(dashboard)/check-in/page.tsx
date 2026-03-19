@@ -43,6 +43,7 @@ import {
 } from "@radiance/ui";
 import { formatCurrency } from "@radiance/utils";
 import { services, serviceCategories } from "@radiance/mock-data";
+import { useUserStore } from "@/application/user/user.store";
 
 type BookingStatus = "confirmed" | "checked-in" | "in-progress" | "completed" | "no-show";
 
@@ -282,12 +283,8 @@ function CheckInPageContent() {
   const [walkInForm, setWalkInForm] = useState<WalkInForm>(initialWalkInForm);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isProcessing, setIsProcessing] = useState(false);
-  const [userRole, setUserRole] = useState<"admin" | "staff">("admin");
-
-  useEffect(() => {
-    const role = localStorage.getItem("userRole") as "admin" | "staff";
-    if (role) setUserRole(role);
-  }, []);
+  const profile = useUserStore((s) => s.profile);
+  const userRole: "admin" | "staff" = profile?.role?.toLowerCase() === "staff" ? "staff" : "admin";
 
   // Check if opened with walkin param
   useEffect(() => {

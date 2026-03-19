@@ -2,16 +2,19 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, Mail, Lock, Shield, Users, ArrowRight } from "lucide-react";
-import { Button, Input, Label, Card, CardContent, Tabs, TabsList, TabsTrigger, TabsContent } from "@radiance/ui";
-
-type UserRole = "admin" | "staff";
+import { Eye, EyeOff, Mail, Lock, ArrowRight, AlertCircle } from "lucide-react";
+import { Button, Input, Label, Card, CardContent } from "@radiance/ui";
+import { AuthApiClient } from "@/infrastructure/api/auth.client";
+import { useAuthStore } from "@/application/auth/auth.store";
+import { useUserStore } from "@/application/user/user.store";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<UserRole>("admin");
+  const setAuth = useAuthStore((s) => s.setAuth);
+  const fetchProfile = useUserStore((s) => s.fetchProfile);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -19,55 +22,47 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     setIsLoading(true);
-    
-    // Simulate login
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    
-    // Store role in localStorage for demo purposes
-    localStorage.setItem("userRole", activeTab);
-    
-    // Redirect to dashboard
-    router.push("/dashboard");
+
+    try {
+      const result = await AuthApiClient.login(formData.email, formData.password);
+
+      if (result.isError) {
+        setError(result.errorMessage || "Login failed. Please try again.");
+        return;
+      }
+
+      if (result.data) {
+        setAuth(result.data);
+        await fetchProfile();
+        router.push("/dashboard");
+      }
+    } catch {
+      setError("An unexpected error occurred. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <Card className="bg-white/95 backdrop-blur-md shadow-2xl">
       <CardContent className="p-8">
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as UserRole)}>
-          <TabsList className="grid grid-cols-2 mb-6">
-            <TabsTrigger value="admin" className="flex items-center gap-2">
-              <Shield className="h-4 w-4" />
-              Admin
-            </TabsTrigger>
-            <TabsTrigger value="staff" className="flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              Staff
-            </TabsTrigger>
-          </TabsList>
+        <div className="mb-6">
+          <h2 className="font-display text-xl font-bold text-gray-900">
+            Sign In
+          </h2>
+          <p className="text-sm text-foreground-secondary mt-1">
+            Access the admin portal
+          </p>
+        </div>
 
-          <TabsContent value="admin">
-            <div className="mb-6">
-              <h2 className="font-display text-xl font-bold text-gray-900">
-                Admin Login
-              </h2>
-              <p className="text-sm text-foreground-secondary mt-1">
-                Full access to manage the wellness spa
-              </p>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="staff">
-            <div className="mb-6">
-              <h2 className="font-display text-xl font-bold text-gray-900">
-                Staff Login
-              </h2>
-              <p className="text-sm text-foreground-secondary mt-1">
-                Access your schedule and check-in customers
-              </p>
-            </div>
-          </TabsContent>
-        </Tabs>
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2">
+            <AlertCircle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
+            <p className="text-sm text-red-700">{error}</p>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -77,10 +72,13 @@ export default function LoginPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder={activeTab === "admin" ? "admin@radiancewellness.com" : "staff@radiancewellness.com"}
+                placeholder="admin@radiancewellness.com"
                 className="pl-10"
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                onChange={(e) => {
+                  setFormData({ ...formData, email: e.target.value });
+                  if (error) setError(null);
+                }}
                 required
               />
             </div>
@@ -96,7 +94,10 @@ export default function LoginPage() {
                 placeholder="Enter your password"
                 className="pl-10 pr-10"
                 value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                onChange={(e) => {
+                  setFormData({ ...formData, password: e.target.value });
+                  if (error) setError(null);
+                }}
                 required
               />
               <button
@@ -127,45 +128,12 @@ export default function LoginPage() {
               </>
             ) : (
               <>
-                Sign in as {activeTab === "admin" ? "Admin" : "Staff"}
+                Sign In
                 <ArrowRight className="ml-2 h-4 w-4" />
               </>
             )}
           </Button>
         </form>
-
-        {/* Demo hint */}
-        <div className="mt-6 p-4 bg-primary-50 rounded-lg">
-          <p className="text-sm text-primary-700 text-center">
-            <strong>Demo Mode:</strong> Enter any credentials to sign in as {activeTab}
-          </p>
-        </div>
-
-        {/* Quick access cards */}
-        <div className="mt-6 grid grid-cols-2 gap-3">
-          <button
-            onClick={() => {
-              setActiveTab("admin");
-              setFormData({ email: "admin@demo.com", password: "demo123" });
-            }}
-            className="p-3 text-left border border-border rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            <Shield className="h-5 w-5 text-primary-600 mb-1" />
-            <p className="text-xs font-medium">Demo Admin</p>
-            <p className="text-xs text-foreground-muted">Full access</p>
-          </button>
-          <button
-            onClick={() => {
-              setActiveTab("staff");
-              setFormData({ email: "staff@demo.com", password: "demo123" });
-            }}
-            className="p-3 text-left border border-border rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            <Users className="h-5 w-5 text-accent-600 mb-1" />
-            <p className="text-xs font-medium">Demo Staff</p>
-            <p className="text-xs text-foreground-muted">Limited access</p>
-          </button>
-        </div>
       </CardContent>
     </Card>
   );

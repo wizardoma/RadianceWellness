@@ -2,8 +2,6 @@ server:
   port: ${SERVER_PORT:8080}
 
 spring:
-  profiles:
-    active: dev
   application:
     name: radiance-wellness
   jpa:

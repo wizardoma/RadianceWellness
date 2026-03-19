@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useUserStore } from "@/application/user/user.store";
 import {
   Calendar,
   Users,
@@ -77,13 +77,8 @@ const getStatusBadge = (status: string) => {
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [userRole, setUserRole] = useState<UserRole>("admin");
-
-  useEffect(() => {
-    const role = localStorage.getItem("userRole") as UserRole;
-    if (role) setUserRole(role);
-  }, []);
-
+  const profile = useUserStore((s) => s.profile);
+  const userRole: UserRole = profile?.role?.toLowerCase() === "staff" ? "staff" : "admin";
   const isAdmin = userRole === "admin";
 
   return (
@@ -92,7 +87,7 @@ export default function DashboardPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="font-display text-2xl sm:text-3xl font-bold text-gray-900">
-            {isAdmin ? "Admin Dashboard" : "Welcome, Chidi!"}
+            {isAdmin ? "Admin Dashboard" : `Welcome, ${profile?.firstName ?? ""}!`}
           </h1>
           <p className="text-foreground-secondary mt-1">
             {isAdmin ? "Overview of your wellness spa" : "Here's your schedule for today"}
