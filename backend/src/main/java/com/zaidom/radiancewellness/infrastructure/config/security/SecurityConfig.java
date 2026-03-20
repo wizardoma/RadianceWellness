@@ -1,5 +1,6 @@
 package com.zaidom.radiancewellness.infrastructure.config.security;
 
+import com.zaidom.radiancewellness.infrastructure.security.CustomAuthenticationEntryPoint;
 import com.zaidom.radiancewellness.infrastructure.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -26,10 +27,12 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final CustomAuthenticationEntryPoint authenticationEntryPoint;
 
     private static final String[] PUBLIC_ENDPOINTS = {
             "/api/v1/auth/**",
             "/api/v1/admin/auth/**",
+            "/api/v1/staff/auth/**",
             "/api/v1/health",
             "/api/v1/services/**",
             "/api/v1/services",
@@ -54,6 +57,7 @@ public class SecurityConfig {
                         .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
                         .anyRequest().authenticated()
                 )
+                .exceptionHandling(ex -> ex.authenticationEntryPoint(authenticationEntryPoint))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

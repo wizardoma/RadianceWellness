@@ -11,4 +11,6 @@ import java.util.List;
 public interface ServiceAddOnRepository extends JpaRepository<ServiceAddOn, String> {
 
     List<ServiceAddOn> findByStatus(ServiceStatus status);
+
+    List<ServiceAddOn> findByServicesId(String serviceId);
 }

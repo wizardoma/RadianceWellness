@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Search, Plus, Edit, Trash2, Clock, Star } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Search, Plus, Edit, Trash2, Clock, Star, Loader2 } from "lucide-react";
 import {
   Button,
   Card,
@@ -23,79 +23,175 @@ import {
   SelectContent,
   SelectItem,
 } from "@radiance/ui";
-import { services as initialServices, serviceCategories } from "@radiance/mock-data";
 import { formatCurrency } from "@radiance/utils";
+import { useServicesStore } from "@/application/services/services.store";
+import type { ServiceSummary, CreateServicePayload } from "@/infrastructure/api/services.client";
 
-type ServiceItem = typeof initialServices[number];
+interface PricingEntry {
+  duration: string;
+  price: string;
+}
 
 const emptyServiceForm = {
   name: "",
-  category: "",
+  categoryId: "",
   shortDescription: "",
-  duration: "",
-  price: "",
-  isActive: true,
-  requiresStaff: true,
+  description: "",
+  isPopular: false,
 };
 
+const defaultPricingEntry: PricingEntry = { duration: "", price: "" };
+
 export default function ServicesPage() {
+  const {
+    services,
+    categories,
+    isLoading,
+    isCategoriesLoading,
+    isSaving,
+    categoryFilter,
+    error,
+    fetchServices,
+    fetchCategories,
+    setCategoryFilter,
+    createService,
+    updateService,
+    deleteService,
+    clearError,
+  } = useServicesStore();
+
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [servicesList, setServicesList] = useState(initialServices);
+  const [debouncedQuery, setDebouncedQuery] = useState("");
 
   // Add/Edit Service dialog
   const [serviceDialogOpen, setServiceDialogOpen] = useState(false);
-  const [editingService, setEditingService] = useState<ServiceItem | null>(null);
+  const [editingService, setEditingService] = useState<ServiceSummary | null>(null);
   const [serviceForm, setServiceForm] = useState(emptyServiceForm);
+  const [pricingEntries, setPricingEntries] = useState<PricingEntry[]>([{ ...defaultPricingEntry }]);
 
   // Delete confirmation dialog
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [deletingService, setDeletingService] = useState<ServiceItem | null>(null);
+  const [deletingService, setDeletingService] = useState<ServiceSummary | null>(null);
 
-  const filteredServices = servicesList.filter((service) => {
-    const matchesSearch = service.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = !selectedCategory || service.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
+  // Fetch data on mount
+  useEffect(() => {
+    fetchCategories();
+    fetchServices();
+  }, [fetchCategories, fetchServices]);
+
+  // Debounced search
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedQuery(searchQuery), 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Filter services locally by search (API already handles category filter)
+  const filteredServices = debouncedQuery
+    ? services.filter((s) =>
+        s.name.toLowerCase().includes(debouncedQuery.toLowerCase())
+      )
+    : services;
 
   const handleOpenAddDialog = () => {
     setEditingService(null);
     setServiceForm(emptyServiceForm);
+    setPricingEntries([{ ...defaultPricingEntry }]);
+    clearError();
     setServiceDialogOpen(true);
   };
 
-  const handleOpenEditDialog = (service: ServiceItem) => {
+  const handleOpenEditDialog = (service: ServiceSummary) => {
     setEditingService(service);
+    const categoryMatch = categories.find((c) => c.slug === service.categorySlug);
     setServiceForm({
       name: service.name,
-      category: service.category,
+      categoryId: categoryMatch?.id ?? "",
       shortDescription: service.shortDescription,
-      duration: service.duration[0]?.toString() ?? "",
-      price: Object.values(service.price)[0]?.toString() ?? "",
-      isActive: true,
-      requiresStaff: true,
+      description: "",
+      isPopular: service.isPopular,
     });
+    // Populate pricing entries from the service's pricing map
+    const entries = Object.entries(service.pricing).map(([dur, price]) => ({
+      duration: dur.toString(),
+      price: price.toString(),
+    }));
+    setPricingEntries(entries.length > 0 ? entries : [{ ...defaultPricingEntry }]);
+    clearError();
     setServiceDialogOpen(true);
   };
 
-  const handleSaveService = () => {
-    // In a real app this would call an API
-    setServiceDialogOpen(false);
-    setEditingService(null);
-    setServiceForm(emptyServiceForm);
+  const handleAddPricingEntry = () => {
+    setPricingEntries([...pricingEntries, { ...defaultPricingEntry }]);
   };
 
-  const handleOpenDeleteDialog = (service: ServiceItem) => {
+  const handleRemovePricingEntry = (index: number) => {
+    if (pricingEntries.length <= 1) return;
+    setPricingEntries(pricingEntries.filter((_, i) => i !== index));
+  };
+
+  const handlePricingChange = (index: number, field: keyof PricingEntry, value: string) => {
+    const updated = [...pricingEntries];
+    updated[index] = { ...updated[index], [field]: value };
+    setPricingEntries(updated);
+  };
+
+  const handleSaveService = async () => {
+    // Build pricing map and duration array from entries
+    const pricing: Record<number, number> = {};
+    const duration: number[] = [];
+
+    for (const entry of pricingEntries) {
+      const dur = parseInt(entry.duration);
+      const price = parseFloat(entry.price);
+      if (!isNaN(dur) && !isNaN(price) && dur > 0 && price > 0) {
+        pricing[dur] = price;
+        duration.push(dur);
+      }
+    }
+
+    if (duration.length === 0) return;
+
+    const payload = {
+      name: serviceForm.name,
+      categoryId: serviceForm.categoryId,
+      description: serviceForm.description || serviceForm.shortDescription,
+      shortDescription: serviceForm.shortDescription,
+      pricing,
+      duration,
+      isPopular: serviceForm.isPopular,
+    };
+
+    if (editingService) {
+      const success = await updateService(editingService.id, payload);
+      if (success) {
+        setServiceDialogOpen(false);
+        setEditingService(null);
+        setServiceForm(emptyServiceForm);
+        setPricingEntries([{ ...defaultPricingEntry }]);
+      }
+    } else {
+      const success = await createService(payload as CreateServicePayload);
+      if (success) {
+        setServiceDialogOpen(false);
+        setServiceForm(emptyServiceForm);
+        setPricingEntries([{ ...defaultPricingEntry }]);
+      }
+    }
+  };
+
+  const handleOpenDeleteDialog = (service: ServiceSummary) => {
     setDeletingService(service);
     setDeleteDialogOpen(true);
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (deletingService) {
-      setServicesList((prev) => prev.filter((s) => s.id !== deletingService.id));
+      const success = await deleteService(deletingService.id);
+      if (success) {
+        setDeleteDialogOpen(false);
+        setDeletingService(null);
+      }
     }
-    setDeleteDialogOpen(false);
-    setDeletingService(null);
   };
 
   return (
@@ -107,7 +203,7 @@ export default function ServicesPage() {
             Services
           </h1>
           <p className="text-foreground-secondary mt-1">
-            Manage your service catalog
+            Manage your service catalog ({filteredServices.length} services)
           </p>
         </div>
         <Button onClick={handleOpenAddDialog}>
@@ -129,18 +225,18 @@ export default function ServicesPage() {
         </div>
         <div className="flex gap-2 flex-wrap">
           <Button
-            variant={selectedCategory === null ? "default" : "outline"}
+            variant={categoryFilter === null ? "default" : "outline"}
             size="sm"
-            onClick={() => setSelectedCategory(null)}
+            onClick={() => setCategoryFilter(null)}
           >
             All
           </Button>
-          {serviceCategories.map((category) => (
+          {categories.map((category) => (
             <Button
               key={category.id}
-              variant={selectedCategory === category.id ? "default" : "outline"}
+              variant={categoryFilter === category.slug ? "default" : "outline"}
               size="sm"
-              onClick={() => setSelectedCategory(category.id)}
+              onClick={() => setCategoryFilter(category.slug)}
             >
               {category.name}
             </Button>
@@ -148,65 +244,90 @@ export default function ServicesPage() {
         </div>
       </div>
 
+      {/* Loading state */}
+      {isLoading && (
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
+        </div>
+      )}
+
       {/* Services Grid */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredServices.map((service) => (
-          <Card key={service.id} className="hover:shadow-md transition-shadow">
-            <CardContent className="p-6">
-              <div className="flex justify-between items-start mb-3">
-                <div>
-                  <h3 className="font-semibold text-lg">{service.name}</h3>
-                  <p className="text-sm text-foreground-muted capitalize">
-                    {service.category.replace("-", " & ")}
-                  </p>
-                </div>
-                {service.isPopular && (
-                  <Badge className="bg-accent-100 text-accent-700">Popular</Badge>
-                )}
-              </div>
-
-              <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-                {service.shortDescription}
-              </p>
-
-              <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-                <span className="flex items-center gap-1">
-                  <Clock className="h-4 w-4" />
-                  {service.duration.join("/")} min
-                </span>
-                <span className="flex items-center gap-1">
-                  <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-                  {service.rating} ({service.reviewCount})
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div>
-                  <span className="font-bold text-primary-600">
-                    {formatCurrency(Object.values(service.price)[0])}
-                  </span>
-                  {Object.keys(service.price).length > 1 && (
-                    <span className="text-sm text-gray-400"> - {formatCurrency(Object.values(service.price).pop()!)}</span>
+      {!isLoading && (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredServices.map((service) => (
+            <Card key={service.id} className="hover:shadow-md transition-shadow">
+              <CardContent className="p-6">
+                <div className="flex justify-between items-start mb-3">
+                  <div>
+                    <h3 className="font-semibold text-lg">{service.name}</h3>
+                    <p className="text-sm text-foreground-muted">
+                      {service.categoryName}
+                    </p>
+                  </div>
+                  {service.isPopular && (
+                    <Badge className="bg-accent-100 text-accent-700">Popular</Badge>
                   )}
                 </div>
-                <div className="flex gap-1">
-                  <Button variant="ghost" size="icon" onClick={() => handleOpenEditDialog(service)}>
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-red-500 hover:text-red-600"
-                    onClick={() => handleOpenDeleteDialog(service)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+
+                <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+                  {service.shortDescription}
+                </p>
+
+                <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+                  <span className="flex items-center gap-1">
+                    <Clock className="h-4 w-4" />
+                    {service.duration.join("/")} min
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+                    {service.rating} ({service.reviewCount})
+                  </span>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    {(() => {
+                      const prices = Object.values(service.pricing).sort((a, b) => a - b);
+                      return (
+                        <>
+                          <span className="font-bold text-primary-600">
+                            {formatCurrency(prices[0])}
+                          </span>
+                          {prices.length > 1 && (
+                            <span className="text-sm text-gray-400">
+                              {" "}- {formatCurrency(prices[prices.length - 1])}
+                            </span>
+                          )}
+                        </>
+                      );
+                    })()}
+                  </div>
+                  <div className="flex gap-1">
+                    <Button variant="ghost" size="icon" onClick={() => handleOpenEditDialog(service)}>
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-red-500 hover:text-red-600"
+                      onClick={() => handleOpenDeleteDialog(service)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {/* Empty state */}
+      {!isLoading && filteredServices.length === 0 && (
+        <div className="text-center py-12">
+          <p className="text-gray-500">No services found</p>
+        </div>
+      )}
 
       {/* Add/Edit Service Dialog */}
       <Dialog open={serviceDialogOpen} onOpenChange={setServiceDialogOpen}>
@@ -219,6 +340,13 @@ export default function ServicesPage() {
                 : "Fill in the details for the new service."}
             </DialogDescription>
           </DialogHeader>
+
+          {error && (
+            <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-sm text-red-700">{error}</p>
+            </div>
+          )}
+
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="serviceName">Service Name</Label>
@@ -232,14 +360,14 @@ export default function ServicesPage() {
             <div className="space-y-2">
               <Label htmlFor="serviceCategory">Category</Label>
               <Select
-                value={serviceForm.category}
-                onValueChange={(value) => setServiceForm({ ...serviceForm, category: value })}
+                value={serviceForm.categoryId}
+                onValueChange={(value) => setServiceForm({ ...serviceForm, categoryId: value })}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
                 <SelectContent>
-                  {serviceCategories.map((cat) => (
+                  {categories.map((cat) => (
                     <SelectItem key={cat.id} value={cat.id}>
                       {cat.name}
                     </SelectItem>
@@ -256,55 +384,78 @@ export default function ServicesPage() {
                 placeholder="Brief description of the service..."
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="serviceDuration">Duration (minutes)</Label>
-                <Input
-                  id="serviceDuration"
-                  type="number"
-                  value={serviceForm.duration}
-                  onChange={(e) => setServiceForm({ ...serviceForm, duration: e.target.value })}
-                  placeholder="60"
-                />
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <Label>Duration & Pricing</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleAddPricingEntry}
+                >
+                  <Plus className="mr-1 h-3 w-3" />
+                  Add Option
+                </Button>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="servicePrice">Price</Label>
-                <Input
-                  id="servicePrice"
-                  type="number"
-                  value={serviceForm.price}
-                  onChange={(e) => setServiceForm({ ...serviceForm, price: e.target.value })}
-                  placeholder="25000"
-                />
-              </div>
+              {pricingEntries.map((entry, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  <div className="flex-1">
+                    <Input
+                      type="number"
+                      value={entry.duration}
+                      onChange={(e) => handlePricingChange(index, "duration", e.target.value)}
+                      placeholder="Duration (min)"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <Input
+                      type="number"
+                      value={entry.price}
+                      onChange={(e) => handlePricingChange(index, "price", e.target.value)}
+                      placeholder="Price"
+                    />
+                  </div>
+                  {pricingEntries.length > 1 && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="text-red-500 hover:text-red-600 shrink-0"
+                      onClick={() => handleRemovePricingEntry(index)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              ))}
+              <p className="text-xs text-gray-400">Each duration maps to its own price</p>
             </div>
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label>Status</Label>
-                <p className="text-sm text-gray-500">{serviceForm.isActive ? "Active" : "Inactive"}</p>
-              </div>
-              <Switch
-                checked={serviceForm.isActive}
-                onCheckedChange={(checked) => setServiceForm({ ...serviceForm, isActive: checked })}
-              />
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label>Requires Staff</Label>
+                <Label>Popular</Label>
                 <p className="text-sm text-gray-500">
-                  {serviceForm.requiresStaff ? "Staff member required" : "Self-service"}
+                  {serviceForm.isPopular ? "Marked as popular" : "Not marked as popular"}
                 </p>
               </div>
               <Switch
-                checked={serviceForm.requiresStaff}
-                onCheckedChange={(checked) => setServiceForm({ ...serviceForm, requiresStaff: checked })}
+                checked={serviceForm.isPopular}
+                onCheckedChange={(checked) => setServiceForm({ ...serviceForm, isPopular: checked })}
               />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setServiceDialogOpen(false)}>Cancel</Button>
-            <Button onClick={handleSaveService}>
-              {editingService ? "Update Service" : "Save Service"}
+            <Button variant="outline" onClick={() => setServiceDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSaveService} disabled={isSaving}>
+              {isSaving ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                editingService ? "Update Service" : "Save Service"
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -325,9 +476,15 @@ export default function ServicesPage() {
             </p>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
-            <Button variant="destructive" onClick={handleConfirmDelete}>
-              <Trash2 className="mr-2 h-4 w-4" />
+            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleConfirmDelete} disabled={isSaving}>
+              {isSaving ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Trash2 className="mr-2 h-4 w-4" />
+              )}
               Delete
             </Button>
           </DialogFooter>

@@ -24,7 +24,7 @@ public class PaginatedApiResponse<T> {
     public static <T> PaginatedApiResponse<T> of(List<T> data, int page, int size, long totalElements, int totalPages) {
         return new PaginatedApiResponse<>(
                 true, "", data, page, size, totalElements, totalPages,
-                page < totalPages - 1, page > 0
+                page < totalPages, page > 1
         );
     }
 }

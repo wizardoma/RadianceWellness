@@ -13,12 +13,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const router = useRouter();
   const ready = useRequireAuth();
   const profile = useUserStore((s) => s.profile);
+  const isProfileLoading = useUserStore((s) => s.isLoading);
   const [isAllowed, setIsAllowed] = useState(true);
 
   const userRole = profile?.role?.toLowerCase();
+  const isFullyReady = ready && profile !== null && !isProfileLoading;
 
   useEffect(() => {
-    if (!ready) return;
+    if (!isFullyReady) return;
     if (userRole === "staff" || userRole === "receptionist") {
       const allowed = staffAllowedPaths.some(path => pathname === path || pathname.startsWith(path + "/"));
       if (!allowed) {
@@ -28,9 +30,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         setIsAllowed(true);
       }
     }
-  }, [pathname, router, ready, userRole]);
+  }, [pathname, router, isFullyReady, userRole]);
 
-  if (!ready) {
+  if (!isFullyReady) {
     return (
       <div className="flex min-h-screen bg-gray-50 items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary-600 border-t-transparent" />

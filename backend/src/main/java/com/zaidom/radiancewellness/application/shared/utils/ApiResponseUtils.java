@@ -35,7 +35,7 @@ public class ApiResponseUtils {
     public static <T> ResponseEntity<PaginatedApiResponse<T>> paginatedResponse(Page<T> page) {
         return ResponseEntity.ok(PaginatedApiResponse.of(
                 page.getContent(),
-                page.getNumber(),
+                page.getNumber() + 1,
                 page.getSize(),
                 page.getTotalElements(),
                 page.getTotalPages()

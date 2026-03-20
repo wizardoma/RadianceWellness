@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, Mail, Lock, ArrowRight, AlertCircle } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, ArrowRight, AlertCircle, Clock } from "lucide-react";
 import { Button, Input, Label, Card, CardContent } from "@radiance/ui";
 import { AuthApiClient } from "@/infrastructure/api/auth.client";
 import { useAuthStore } from "@/application/auth/auth.store";
@@ -15,6 +15,18 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [sessionExpired, setSessionExpired] = useState(false);
+
+  useEffect(() => {
+    const expired = localStorage.getItem("radiance_session_expired");
+    if (expired) {
+      setSessionExpired(true);
+      localStorage.removeItem("radiance_session_expired");
+      // Auto-dismiss after 5 seconds
+      const timer = setTimeout(() => setSessionExpired(false), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, []);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -46,6 +58,16 @@ export default function LoginPage() {
   };
 
   return (
+    <>
+      {sessionExpired && (
+        <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2 animate-in fade-in slide-in-from-top-2">
+          <Clock className="h-5 w-5 text-amber-600 shrink-0" />
+          <p className="text-sm text-amber-800 font-medium">Your session has expired. Please sign in again.</p>
+          <button onClick={() => setSessionExpired(false)} className="ml-auto text-amber-600 hover:text-amber-800 text-sm">
+            &times;
+          </button>
+        </div>
+      )}
     <Card className="bg-white/95 backdrop-blur-md shadow-2xl">
       <CardContent className="p-8">
         <div className="mb-6">
@@ -136,5 +158,6 @@ export default function LoginPage() {
         </form>
       </CardContent>
     </Card>
+    </>
   );
 }

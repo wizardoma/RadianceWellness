@@ -225,6 +225,10 @@ function handleAuthFailure() {
     localStorage.removeItem("radiance_access_token");
     localStorage.removeItem("radiance_refresh_token");
     localStorage.removeItem("radiance_user");
+
+    // Store a flag so the login page can show a toast
+    localStorage.setItem("radiance_session_expired", "true");
+
     window.location.href = "/login";
   }
 }
