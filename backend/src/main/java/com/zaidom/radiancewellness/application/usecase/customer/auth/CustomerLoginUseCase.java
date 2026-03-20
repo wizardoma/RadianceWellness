@@ -32,6 +32,12 @@ public class CustomerLoginUseCase {
         Customer customer = customerRepository.findByEmail(email)
                 .orElseThrow(() -> new UnauthorizedException("Invalid email or password"));
 
+        // Check if customer has a password (walk-in customers don't until they register)
+        if (customer.getPassword() == null || customer.getPassword().isBlank()) {
+            log.warn("Walk-in customer attempted login without registration for email: {}", email);
+            throw new UnauthorizedException("Please register your account first to set a password");
+        }
+
         // Check if account is locked
         if (customer.getLockedUntil() != null && customer.getLockedUntil().isAfter(LocalDateTime.now())) {
             log.warn("Customer account locked for email: {}", email);

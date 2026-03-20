@@ -2,14 +2,17 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Eye, EyeOff, Mail, Lock, User, Phone, ArrowRight, Check } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Eye, EyeOff, Mail, Lock, User, Phone, ArrowRight, Check, AlertCircle, CheckCircle2 } from "lucide-react";
 import { Button, Input, Label, Checkbox } from "@radiance/ui";
+import { AuthApiClient } from "@/infrastructure/api/auth.client";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -23,13 +26,37 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    if (!formData.acceptTerms) {
+      setError("You must accept the Terms of Service and Privacy Policy");
+      return;
+    }
+
     setIsLoading(true);
-    
-    // Simulate registration
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    
-    // Redirect to dashboard
-    router.push("/dashboard");
+
+    const result = await AuthApiClient.register(
+      formData.firstName,
+      formData.lastName,
+      formData.email,
+      formData.phone,
+      formData.password
+    );
+
+    if (result.isError) {
+      setError(result.errorMessage);
+      setIsLoading(false);
+      return;
+    }
+
+    // Redirect to login with success message
+    const message = result.data?.message || "Account created successfully";
+    router.push(`/login?registered=${encodeURIComponent(message)}`);
   };
 
   const passwordRequirements = [
@@ -37,6 +64,8 @@ export default function RegisterPage() {
     { label: "Contains a number", met: /\d/.test(formData.password) },
     { label: "Contains uppercase letter", met: /[A-Z]/.test(formData.password) },
   ];
+
+  const registeredMessage = searchParams.get("registered");
 
   return (
     <div>
@@ -48,6 +77,22 @@ export default function RegisterPage() {
           Join Radiance and start your wellness journey today
         </p>
       </div>
+
+      {/* Success message from registration redirect */}
+      {registeredMessage && (
+        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-start gap-3">
+          <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5 shrink-0" />
+          <p className="text-sm text-green-700">{registeredMessage}</p>
+        </div>
+      )}
+
+      {/* Error message */}
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
+          <AlertCircle className="h-5 w-5 text-red-600 mt-0.5 shrink-0" />
+          <p className="text-sm text-red-700">{error}</p>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
@@ -170,7 +215,7 @@ export default function RegisterPage() {
             <Checkbox
               id="terms"
               checked={formData.acceptTerms}
-              onCheckedChange={(checked) => 
+              onCheckedChange={(checked) =>
                 setFormData({ ...formData, acceptTerms: checked as boolean })
               }
               className="mt-0.5"
@@ -186,7 +231,7 @@ export default function RegisterPage() {
             <Checkbox
               id="updates"
               checked={formData.receiveUpdates}
-              onCheckedChange={(checked) => 
+              onCheckedChange={(checked) =>
                 setFormData({ ...formData, receiveUpdates: checked as boolean })
               }
               className="mt-0.5"
@@ -197,9 +242,9 @@ export default function RegisterPage() {
           </div>
         </div>
 
-        <Button 
-          type="submit" 
-          className="w-full" 
+        <Button
+          type="submit"
+          className="w-full"
           disabled={isLoading || !formData.acceptTerms}
         >
           {isLoading ? (
@@ -222,13 +267,6 @@ export default function RegisterPage() {
           Sign in
         </Link>
       </p>
-
-      {/* Demo hint */}
-      <div className="mt-6 p-4 bg-primary-50 rounded-lg text-center">
-        <p className="text-sm text-primary-700">
-          <strong>Demo Mode:</strong> Fill in any details to create a demo account
-        </p>
-      </div>
     </div>
   );
 }

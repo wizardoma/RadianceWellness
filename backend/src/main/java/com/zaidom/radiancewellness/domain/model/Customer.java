@@ -2,6 +2,7 @@ package com.zaidom.radiancewellness.domain.model;
 
 import com.zaidom.radiancewellness.domain.enums.CustomerStatus;
 import com.zaidom.radiancewellness.domain.enums.Gender;
+import com.zaidom.radiancewellness.domain.enums.RegistrationSource;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -60,8 +61,10 @@ public class Customer extends BaseEntity {
     @Builder.Default
     private CustomerStatus status = CustomerStatus.ACTIVE;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "registration_source")
-    private String registrationSource;
+    @Builder.Default
+    private RegistrationSource registrationSource = RegistrationSource.SELF_REGISTERED;
 
     @Column(columnDefinition = "text")
     private String notes;
@@ -94,7 +97,7 @@ public class Customer extends BaseEntity {
     @Builder.Default
     private Boolean whatsappOptIn = false;
 
-    @Column(nullable = false)
+    @Column
     private String password;
 
     @Column(name = "email_verified", nullable = false)

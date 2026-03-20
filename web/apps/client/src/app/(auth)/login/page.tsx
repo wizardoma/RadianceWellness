@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Eye, EyeOff, Mail, Lock, ArrowRight } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Eye, EyeOff, Mail, Lock, ArrowRight, AlertCircle, CheckCircle2 } from "lucide-react";
 import {
   Button,
   Input,
@@ -16,11 +16,19 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@radiance/ui";
+import { AuthApiClient } from "@/infrastructure/api/auth.client";
+import { useAuthStore } from "@/application/auth/auth.store";
+import { useUserStore } from "@/application/user/user.store";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const setAuth = useAuthStore((s) => s.setAuth);
+  const fetchProfile = useUserStore((s) => s.fetchProfile);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [sessionExpired, setSessionExpired] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -29,15 +37,33 @@ export default function LoginPage() {
   const [socialDialogOpen, setSocialDialogOpen] = useState(false);
   const [socialProvider, setSocialProvider] = useState("");
 
+  // Check for session expired flag
+  useEffect(() => {
+    const expired = localStorage.getItem("radiance_session_expired");
+    if (expired === "true") {
+      setSessionExpired(true);
+      localStorage.removeItem("radiance_session_expired");
+    }
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     setIsLoading(true);
 
-    // Simulate login - in demo, any credentials work
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    const result = await AuthApiClient.login(formData.email, formData.password);
 
-    // Redirect to dashboard
-    router.push("/dashboard");
+    if (result.isError) {
+      setError(result.errorMessage);
+      setIsLoading(false);
+      return;
+    }
+
+    if (result.data) {
+      setAuth(result.data);
+      await fetchProfile();
+      router.push("/dashboard");
+    }
   };
 
   const handleSocialLogin = (provider: string) => {
@@ -55,6 +81,36 @@ export default function LoginPage() {
           Sign in to manage your bookings and wellness journey
         </p>
       </div>
+
+      {/* Registration success message */}
+      {searchParams.get("registered") && (
+        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-start gap-3">
+          <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5 shrink-0" />
+          <div>
+            <p className="text-sm font-medium text-green-800">Registration successful</p>
+            <p className="text-sm text-green-700">{searchParams.get("registered")}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Session expired toast */}
+      {sessionExpired && (
+        <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg flex items-start gap-3">
+          <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5 shrink-0" />
+          <div>
+            <p className="text-sm font-medium text-amber-800">Session expired</p>
+            <p className="text-sm text-amber-700">Please sign in again to continue.</p>
+          </div>
+        </div>
+      )}
+
+      {/* Error message */}
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
+          <AlertCircle className="h-5 w-5 text-red-600 mt-0.5 shrink-0" />
+          <p className="text-sm text-red-700">{error}</p>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
@@ -194,13 +250,6 @@ export default function LoginPage() {
           Create account
         </Link>
       </p>
-
-      {/* Demo hint */}
-      <div className="mt-6 p-4 bg-primary-50 rounded-lg text-center">
-        <p className="text-sm text-primary-700">
-          <strong>Demo Mode:</strong> Enter any email and password to sign in
-        </p>
-      </div>
     </div>
   );
 }

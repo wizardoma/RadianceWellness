@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   Calendar,
@@ -20,6 +20,9 @@ import {
 import { cn } from "@radiance/utils";
 import { Button, LogoIcon } from "@radiance/ui";
 import { useState } from "react";
+import { useUserStore } from "@/application/user/user.store";
+import { useAuthStore } from "@/application/auth/auth.store";
+import { AuthApiClient } from "@/infrastructure/api/auth.client";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -33,17 +36,30 @@ const navigation = [
   { name: "My Profile", href: "/profile", icon: User },
 ];
 
-// Mock user data
-const user = {
-  name: "Sarah Johnson",
-  email: "sarah.johnson@example.com",
-  avatar: null,
-  memberSince: "2024",
-};
-
 export function DashboardSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const profile = useUserStore((s) => s.profile);
+  const clearProfile = useUserStore((s) => s.clearProfile);
+  const clearAuth = useAuthStore((s) => s.clearAuth);
+
+  const displayName = profile
+    ? `${profile.firstName} ${profile.lastName}`
+    : "Loading...";
+  const displayEmail = profile?.email ?? "";
+  const initials = profile
+    ? `${profile.firstName[0]}${profile.lastName[0]}`
+    : "";
+
+  const handleSignOut = async () => {
+    setIsLoggingOut(true);
+    await AuthApiClient.logout();
+    clearAuth();
+    clearProfile();
+    router.push("/login");
+  };
 
   return (
     <>
@@ -61,7 +77,7 @@ export function DashboardSidebar() {
 
       {/* Mobile overlay */}
       {isMobileOpen && (
-        <div 
+        <div
           className="lg:hidden fixed inset-0 bg-black/50 z-40"
           onClick={() => setIsMobileOpen(false)}
         />
@@ -90,12 +106,12 @@ export function DashboardSidebar() {
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center">
                 <span className="text-primary-700 font-medium">
-                  {user.name.split(" ").map(n => n[0]).join("")}
+                  {initials}
                 </span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">{user.name}</p>
-                <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                <p className="text-sm font-medium text-gray-900 truncate">{displayName}</p>
+                <p className="text-xs text-gray-500 truncate">{displayEmail}</p>
               </div>
             </div>
           </div>
@@ -139,13 +155,14 @@ export function DashboardSidebar() {
 
           {/* Logout */}
           <div className="p-4 border-t border-border">
-            <Link
-              href="/login"
-              className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all"
+            <button
+              onClick={handleSignOut}
+              disabled={isLoggingOut}
+              className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all w-full"
             >
               <LogOut className="h-5 w-5 text-gray-400" />
-              Sign out
-            </Link>
+              {isLoggingOut ? "Signing out..." : "Sign out"}
+            </button>
           </div>
         </div>
       </aside>

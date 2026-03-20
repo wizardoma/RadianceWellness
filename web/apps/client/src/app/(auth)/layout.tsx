@@ -1,11 +1,24 @@
+"use client";
+
 import Link from "next/link";
 import { LogoIcon } from "@radiance/ui";
+import { useRedirectIfAuthenticated } from "@/application/hooks/useAuthGuard";
 
 export default function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const ready = useRedirectIfAuthenticated();
+
+  if (!ready) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary-600 border-t-transparent" />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex">
       {/* Left side - Branding */}
@@ -20,17 +33,17 @@ export default function AuthLayout({
             </span>
           </Link>
         </div>
-        
+
         <div className="space-y-6">
           <h1 className="font-display text-4xl font-bold text-white leading-tight">
             Your Wellness Journey<br />
             <span className="text-accent-300">Starts Here</span>
           </h1>
           <p className="text-primary-100 text-lg max-w-md">
-            Book premium spa treatments, manage your appointments, and enjoy exclusive 
+            Book premium spa treatments, manage your appointments, and enjoy exclusive
             member benefits all in one place.
           </p>
-          
+
           <div className="flex items-center gap-8 pt-4">
             <div>
               <div className="text-3xl font-bold text-white">15+</div>
@@ -48,7 +61,7 @@ export default function AuthLayout({
         </div>
 
         <div className="text-primary-200 text-sm">
-          © {new Date().getFullYear()} Radiance Wellness Spa
+          &copy; {new Date().getFullYear()} Radiance Wellness Spa
         </div>
       </div>
 
@@ -64,7 +77,7 @@ export default function AuthLayout({
               </span>
             </Link>
           </div>
-          
+
           {children}
         </div>
       </div>

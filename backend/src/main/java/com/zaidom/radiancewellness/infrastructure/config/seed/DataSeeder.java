@@ -1,12 +1,15 @@
 package com.zaidom.radiancewellness.infrastructure.config.seed;
 
+import com.zaidom.radiancewellness.domain.enums.AccommodationType;
 import com.zaidom.radiancewellness.domain.enums.ServiceStatus;
 import com.zaidom.radiancewellness.domain.enums.UserRole;
 import com.zaidom.radiancewellness.domain.enums.UserStatus;
+import com.zaidom.radiancewellness.domain.model.Accommodation;
 import com.zaidom.radiancewellness.domain.model.Service;
 import com.zaidom.radiancewellness.domain.model.ServiceAddOn;
 import com.zaidom.radiancewellness.domain.model.ServiceCategory;
 import com.zaidom.radiancewellness.domain.model.User;
+import com.zaidom.radiancewellness.infrastructure.persistence.repository.AccommodationRepository;
 import com.zaidom.radiancewellness.infrastructure.persistence.repository.ServiceAddOnRepository;
 import com.zaidom.radiancewellness.infrastructure.persistence.repository.ServiceCategoryRepository;
 import com.zaidom.radiancewellness.infrastructure.persistence.repository.ServiceRepository;
@@ -35,11 +38,13 @@ public class DataSeeder implements ApplicationRunner {
     private final ServiceCategoryRepository serviceCategoryRepository;
     private final ServiceRepository serviceRepository;
     private final ServiceAddOnRepository serviceAddOnRepository;
+    private final AccommodationRepository accommodationRepository;
 
     @Override
     public void run(ApplicationArguments args) {
         seedAdminUser();
         seedServiceData();
+        seedAccommodations();
     }
 
     private void seedAdminUser() {
@@ -434,5 +439,64 @@ public class DataSeeder implements ApplicationRunner {
                 .isPopular(isPopular)
                 .status(ServiceStatus.ACTIVE)
                 .build());
+    }
+
+    private void seedAccommodations() {
+        if (accommodationRepository.count() == 0) {
+            log.info("Seeding accommodations...");
+
+            accommodationRepository.save(Accommodation.builder()
+                    .name("Premium Luxury Apartment")
+                    .slug("premium-luxury-apartment")
+                    .type(AccommodationType.PREMIUM)
+                    .description("Experience the pinnacle of luxury in our premium apartment featuring a spacious living area, fully equipped modern kitchen, premium bedding, rain shower, smart TV, and a private balcony with stunning views. Perfect for those seeking an elevated wellness retreat with all the comforts of home.")
+                    .shortDescription("Spacious luxury apartment with premium amenities and private balcony")
+                    .capacity(4)
+                    .bedrooms(2)
+                    .bathrooms(2)
+                    .size(85)
+                    .pricePerNight(new BigDecimal("75000"))
+                    .pricePerWeek(new BigDecimal("450000"))
+                    .pricePerMonth(new BigDecimal("1500000"))
+                    .cleaningFee(new BigDecimal("15000"))
+                    .securityDeposit(new BigDecimal("100000"))
+                    .amenities(List.of("WiFi", "Air Conditioning", "Kitchen", "Washer", "Dryer", "TV",
+                            "Pool", "Balcony", "Ocean View", "Room Service", "Mini Bar", "Safe",
+                            "Iron", "Hair Dryer", "Towels", "Hot Tub"))
+                    .checkInTime("14:00")
+                    .checkOutTime("11:00")
+                    .minStay(1)
+                    .maxStay(30)
+                    .status(ServiceStatus.ACTIVE)
+                    .build());
+
+            accommodationRepository.save(Accommodation.builder()
+                    .name("Standard Comfort Apartment")
+                    .slug("standard-comfort-apartment")
+                    .type(AccommodationType.STANDARD)
+                    .description("Our cozy standard apartment offers everything you need for a comfortable stay. Features a well-appointed bedroom, modern bathroom, kitchenette, and a relaxing atmosphere. Ideal for solo travelers or couples looking for a peaceful wellness getaway without compromising on comfort.")
+                    .shortDescription("Cozy and comfortable apartment ideal for solo travelers or couples")
+                    .capacity(2)
+                    .bedrooms(1)
+                    .bathrooms(1)
+                    .size(45)
+                    .pricePerNight(new BigDecimal("45000"))
+                    .pricePerWeek(new BigDecimal("270000"))
+                    .pricePerMonth(new BigDecimal("900000"))
+                    .cleaningFee(new BigDecimal("10000"))
+                    .securityDeposit(new BigDecimal("50000"))
+                    .amenities(List.of("WiFi", "Air Conditioning", "Kitchen", "TV",
+                            "Pool", "Safe", "Iron", "Hair Dryer", "Towels", "Parking"))
+                    .checkInTime("15:00")
+                    .checkOutTime("11:00")
+                    .minStay(1)
+                    .maxStay(30)
+                    .status(ServiceStatus.ACTIVE)
+                    .build());
+
+            log.info("Seeded 2 accommodations");
+        } else {
+            log.info("Accommodations already exist, skipping seed");
+        }
     }
 }

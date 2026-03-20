@@ -39,11 +39,14 @@ public class Accommodation extends BaseEntity {
     @Column(name = "short_description", nullable = false)
     private String shortDescription;
 
+    @Column(name = "cover_image")
+    private String coverImage;
+
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
     private List<String> images;
 
-    @Column(nullable = false)
+    @Column
     private String thumbnail;
 
     @Column(nullable = false)

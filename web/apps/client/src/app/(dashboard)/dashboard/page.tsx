@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { 
-  Calendar, 
-  Clock, 
-  CreditCard, 
+import {
+  Calendar,
+  Clock,
+  CreditCard,
   Gift,
   ArrowRight,
   CalendarPlus,
@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { Button, Card, CardContent, CardHeader, CardTitle, Badge } from "@radiance/ui";
 import { formatCurrency } from "@radiance/utils";
+import { useUserStore } from "@/application/user/user.store";
 
 // Mock data
 const upcomingBookings = [
@@ -49,13 +50,16 @@ const recommendedServices = [
 ];
 
 export default function DashboardPage() {
+  const profile = useUserStore((s) => s.profile);
+  const firstName = profile?.firstName ?? "there";
+
   return (
     <div className="space-y-8">
       {/* Welcome Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="font-display text-2xl sm:text-3xl font-bold text-gray-900">
-            Welcome back, Sarah! 👋
+            Welcome back, {firstName}! 👋
           </h1>
           <p className="text-foreground-secondary mt-1">
             Here's what's happening with your wellness journey

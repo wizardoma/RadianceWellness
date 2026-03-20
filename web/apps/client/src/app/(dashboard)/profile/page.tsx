@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { AlertCircle } from "lucide-react";
 import { User, Mail, Phone, MapPin, Calendar, Camera, Save } from "lucide-react";
 import {
   Button,
@@ -23,29 +24,49 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@radiance/ui";
-
-// Mock user data
-const mockUser = {
-  firstName: "Sarah",
-  lastName: "Johnson",
-  email: "sarah.johnson@example.com",
-  phone: "+234 812 345 6789",
-  dateOfBirth: "1990-05-15",
-  address: "15 Admiralty Way, Lekki Phase 1, Lagos",
-  memberSince: "January 2024",
-  membershipTier: "Gold",
-  preferences: {
-    preferredTherapist: "Chidi Eze",
-    communicationPreference: "email",
-    marketingOptIn: true,
-  },
-};
+import { useUserStore } from "@/application/user/user.store";
 
 export default function ProfilePage() {
   const router = useRouter();
+  const profile = useUserStore((s) => s.profile);
+  const updateProfile = useUserStore((s) => s.updateProfile);
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [formData, setFormData] = useState(mockUser);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    dateOfBirth: "",
+    address: "",
+    preferences: {
+      preferredTherapist: "",
+      communicationPreference: "email",
+      marketingOptIn: true,
+    },
+  });
+
+  // Sync form data when profile loads
+  useEffect(() => {
+    if (profile) {
+      setFormData({
+        firstName: profile.firstName,
+        lastName: profile.lastName,
+        email: profile.email,
+        phone: profile.phone,
+        dateOfBirth: profile.dateOfBirth ?? "",
+        address: [profile.address, profile.city, profile.state]
+          .filter(Boolean)
+          .join(", "),
+        preferences: {
+          preferredTherapist: "",
+          communicationPreference: profile.emailOptIn ? "email" : profile.smsOptIn ? "sms" : "email",
+          marketingOptIn: profile.emailOptIn,
+        },
+      });
+    }
+  }, [profile]);
 
   // Avatar upload
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -65,10 +86,24 @@ export default function ProfilePage() {
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
 
   const handleSave = async () => {
+    setSaveError(null);
     setIsSaving(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    const result = await updateProfile({
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      phone: formData.phone,
+      dateOfBirth: formData.dateOfBirth || undefined,
+      address: formData.address || undefined,
+    });
+
     setIsSaving(false);
-    setIsEditing(false);
+
+    if (result.success) {
+      setIsEditing(false);
+    } else {
+      setSaveError(result.error ?? "Failed to update profile");
+    }
   };
 
   const handleAvatarClick = () => {
@@ -80,7 +115,6 @@ export default function ProfilePage() {
     if (file) {
       setPhotoFeedback(true);
       setTimeout(() => setPhotoFeedback(false), 2500);
-      // Reset file input so the same file can be selected again
       e.target.value = "";
     }
   };
@@ -112,6 +146,14 @@ export default function ProfilePage() {
     setDeleteConfirmText("");
     router.push("/login");
   };
+
+  const initials = formData.firstName && formData.lastName
+    ? `${formData.firstName[0]}${formData.lastName[0]}`
+    : "";
+
+  const memberSince = profile?.createdAt
+    ? new Date(profile.createdAt).toLocaleDateString("en-US", { month: "long", year: "numeric" })
+    : "";
 
   return (
     <div className="space-y-6">
@@ -151,6 +193,14 @@ export default function ProfilePage() {
         )}
       </div>
 
+      {/* Save error */}
+      {saveError && (
+        <div className="p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
+          <AlertCircle className="h-5 w-5 text-red-600 mt-0.5 shrink-0" />
+          <p className="text-sm text-red-700">{saveError}</p>
+        </div>
+      )}
+
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Profile Card */}
         <Card>
@@ -159,7 +209,7 @@ export default function ProfilePage() {
               <div className="relative inline-block">
                 <div className="w-24 h-24 rounded-full bg-primary-100 flex items-center justify-center mx-auto">
                   <span className="text-3xl font-semibold text-primary-700">
-                    {formData.firstName[0]}{formData.lastName[0]}
+                    {initials}
                   </span>
                 </div>
                 {isEditing && (
@@ -193,13 +243,15 @@ export default function ProfilePage() {
               <p className="text-sm text-foreground-muted">{formData.email}</p>
 
               <div className="mt-4 p-3 bg-gradient-to-r from-primary-500 to-primary-600 rounded-xl text-white">
-                <p className="text-sm opacity-80">Membership</p>
-                <p className="font-semibold text-lg">{formData.membershipTier} Member</p>
+                <p className="text-sm opacity-80">Status</p>
+                <p className="font-semibold text-lg capitalize">{profile?.status?.toLowerCase() ?? "Active"}</p>
               </div>
 
-              <p className="mt-4 text-sm text-foreground-muted">
-                Member since {formData.memberSince}
-              </p>
+              {memberSince && (
+                <p className="mt-4 text-sm text-foreground-muted">
+                  Member since {memberSince}
+                </p>
+              )}
             </div>
           </CardContent>
         </Card>

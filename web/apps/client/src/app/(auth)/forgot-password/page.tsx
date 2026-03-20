@@ -2,22 +2,30 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Mail, ArrowLeft, Check } from "lucide-react";
+import { Mail, ArrowLeft, Check, AlertCircle } from "lucide-react";
 import { Button, Input, Label } from "@radiance/ui";
+import { AuthApiClient } from "@/infrastructure/api/auth.client";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     setIsLoading(true);
-    
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    
+
+    const result = await AuthApiClient.forgotPassword(email);
+
     setIsLoading(false);
+
+    if (result.isError) {
+      setError(result.errorMessage);
+      return;
+    }
+
     setIsSubmitted(true);
   };
 
@@ -36,7 +44,7 @@ export default function ForgotPasswordPage() {
         </p>
         <p className="text-sm text-foreground-muted mb-8">
           Didn't receive the email? Check your spam folder or{" "}
-          <button 
+          <button
             onClick={() => setIsSubmitted(false)}
             className="text-primary-600 hover:underline"
           >
@@ -55,7 +63,7 @@ export default function ForgotPasswordPage() {
 
   return (
     <div>
-      <Link 
+      <Link
         href="/login"
         className="inline-flex items-center text-sm text-foreground-secondary hover:text-foreground mb-6"
       >
@@ -71,6 +79,14 @@ export default function ForgotPasswordPage() {
           No worries! Enter your email and we'll send you a reset link.
         </p>
       </div>
+
+      {/* Error message */}
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
+          <AlertCircle className="h-5 w-5 text-red-600 mt-0.5 shrink-0" />
+          <p className="text-sm text-red-700">{error}</p>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
